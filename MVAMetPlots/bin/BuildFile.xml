@@ -1,4 +1,4 @@
-<bin name="makeNNDataset" file="makeNNDataset.C">
+<bin name="makeCSVFromData" file="makeCSVFromData.C">
         <use name="root"/>
         <use name="CondFormats/EgammaObjects"/>
         <flags ADD_SUBDIR="1"/>
