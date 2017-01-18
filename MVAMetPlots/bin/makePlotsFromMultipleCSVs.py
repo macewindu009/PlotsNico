@@ -44,8 +44,12 @@ def load_datasetcsv(config):
     
 
     ArtusDict = {
-            "mvamet" : "mvamet ",
-            "met" : "met",
+            "mvamet" : "dmvamet_Pt",
+            "mvametphi" : "dmvamet_Phi",
+            "met" : "dpfmet_Pt",
+            "metphi" : "dpfmet_Phi",
+            "mvaMetSumEt" : "LongZCorrectedRecoil_sumEt",
+            "pfMetSumEt" : "recoilslimmedMETs_sumEt",
             "recoMetPar" : "recoMetPar",
             "recoMetPerp" : "recoMetPerp",
             "recoMetPhi" : "recoMetPhi",
@@ -65,9 +69,10 @@ def load_datasetcsv(config):
             "recoPfMetOnGenMetProjectionPerp" : "recoPfMetOnGenMetProjectionPerp",
             "recoPfMetOnGenMetProjectionPhi" : "recoPfMetOnGenMetProjectionPhi",     
             "genMetSumEt" : "genMetSumEt",
-            "genMetPt" : "genMetPt",
+            "genMetPt" : "genMet_Pt",
             "genMetPhi" : "genMetPhi",
             "npv" : "NVertex",
+            "npu" : "npu",
             "njets" : "NCleanedJets",
             "iso_1" : "iso_1",
             "iso_2" : "iso_2",
@@ -312,6 +317,71 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, res
     
     
     return resultData, dictResult, XRange, YStd
+
+   
+def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0):
+
+
+    #XRange = np.arange(plotData[:,targetindex].min(),plotData[:,targetindex].max(),(plotData[:,targetindex].max()-plotData[:,targetindex].min())/nbins)
+    if minrange == 42:
+	minrange = plotData[:,targetindex].min()
+    if maxrange == 0:
+	maxrange = plotData[:,targetindex].max()
+    if stepwidth == 0:
+	stepwidth = (maxrange-minrange)/20
+    XRange = np.arange(minrange,maxrange,stepwidth)
+    YMean = np.zeros((XRange.shape[0]-1,1))
+    YStd = np.zeros((XRange.shape[0]-1,1))
+    
+    print('MET Resolution %s versus %s'%(bosonName,targetvariable))
+    #YValues 
+    for index in range(0,XRange.shape[0]-1):
+
+	AlternativeDistri = plotData[(XRange[index]<plotData[:,dictPlot[targetvariable]]) & (XRange[index+1]>plotData[:,dictPlot[targetvariable]])]
+	currentDistri = AlternativeDistri[:,dictPlot[bosonName]]+AlternativeDistri[:,dictPlot['genMet_Pt']]
+
+	if currentDistri.shape == (0,1):
+	    YMean[index] = 0
+	    YStd[index] = 0
+	else:
+	    """
+	    print('current bin ',index,' entries:',currentDistri.shape[0])	
+	    print('current bin ',index,' min:',currentDistri.min())
+	    print('current bin ',index,' max:',currentDistri.max())
+	    print('current bin ',index,' mean:',currentDistri.mean())
+	    print('current bin ',index,' std:',currentDistri.std())
+	    """
+	    YMean[index] = currentDistri.mean()
+	    YStd[index] = currentDistri.std()
+	
+	    if index < 12:
+		plt.clf()
+		num_bins = 50
+		n, bins, patches = plt.hist(currentDistri, num_bins, normed=1, facecolor='green', alpha=0.5)
+		y = mlab.normpdf(bins, currentDistri.mean(), currentDistri.std())
+		plt.xlabel('%s at %f, mean: %f'%(targetvariable,(XRange[index+1]+XRange[index])/2,currentDistri.mean()))
+		plt.ylabel('(MET) - (gen MET)')
+		plt.plot(bins, y, 'r--')
+		if ptmax == 0:
+		    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/METResolution_%s_vs_%s_%i.png' %(bosonName,targetvariable, index)))
+		else:
+		    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/METResolution(%i<Pt<%i)_%s_vs_%s_%i.png' %(ptmin,ptmax,bosonName,targetvariable, index)))
+		    
+    plt.clf()
+    plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o')
+    plt.ylabel('(MET) - (gen MET)')
+    plt.xlabel(targetvariable)
+    if ptmax == 0:
+	plt.savefig(config['outputDir'] + "ControlPlots/METResolution_%s_vs_%s.png" %(bosonName,targetvariable))
+    else:
+	plt.savefig(config['outputDir'] + "ControlPlots/METResolution(%i<Pt<%i)_%s_vs_%s.png" %(ptmin,ptmax,bosonName,targetvariable))
+    plt.figure(10)
+    plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o',label=bosonName)
+    plt.figure(0)
+    plt.clf()
+    
+    
+    return 0
     
 def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0):
   
@@ -405,6 +475,67 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resu
     
     return resultData, dictResult, YMean
 
+    
+def make_METResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0):
+  
+    #XRange = np.arange(plotData[:,targetindex].min(),plotData[:,targetindex].max(),(plotData[:,targetindex].max()-plotData[:,targetindex].min())/nbins)
+    if minrange == 42:
+	minrange = plotData[:,dictPlot[targetvariable]].min()
+    if maxrange == 0:
+	maxrange = plotData[:,dictPlot[targetvariable]].max()
+    if stepwidth == 0:
+	stepwidth = (maxrange-minrange)/20
+	
+    XRange = np.arange(minrange,maxrange,stepwidth)
+    YMean = np.zeros((XRange.shape[0]-1,1))
+    YStd = np.zeros((XRange.shape[0]-1,1))
+    print('MET Response %s versus %s'%(bosonName,targetvariable))
+    
+    #YValues 
+    ignoredEntries = 0
+    for index in range(0,XRange.shape[0]-1):
+
+	AlternativeDistri = plotData[(XRange[index]<plotData[:,dictPlot[targetvariable]]) & (XRange[index+1]>plotData[:,dictPlot[targetvariable]])]
+
+	currentDistri = -AlternativeDistri[:,dictPlot[bosonName]]/AlternativeDistri[:,dictPlot['genMet_Pt']]
+	"""
+	if AlternativeDistri.shape[0] == 0:
+	    YMean[index] = 0
+	    YStd[index] = 0
+	else:
+	"""
+	YMean[index] = currentDistri.mean()
+	YStd[index] = currentDistri.std()
+	if index < 12:
+	    plt.clf()
+            num_bins = 50
+	    n, bins, patches = plt.hist(currentDistri, num_bins, normed=1, facecolor='green', alpha=0.5)
+	    y = mlab.normpdf(bins, currentDistri.mean(), currentDistri.std())
+	    plt.xlabel('%s at %f, mean: %f'%(targetvariable,(XRange[index+1]+XRange[index])/2,currentDistri.mean()))
+	    plt.ylabel('(MET)/(gen MET)')
+	    plt.plot(bins, y, 'r--')
+	    if ptmax == 0:
+		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/METResponse_%s_vs_%s_%i.png' %(bosonName,targetvariable, index)))
+	    else:
+		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/METResponse(%i<Pt<%i)_%s_vs_%s_%i.png' %(ptmin,ptmax,bosonName,targetvariable, index)))
+    plt.clf()
+    plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o')
+
+    plt.xlabel(targetvariable)
+    if ptmax == 0:
+	plt.savefig(config['outputDir'] + "ControlPlots/METResponse_%s_vs_%s.png" %(bosonName,targetvariable))
+    else:
+	plt.savefig(config['outputDir'] + "ControlPlots/METResponse(%i<Pt<%i)_%s_vs_%s.png" %(ptmin,ptmax,bosonName,targetvariable))
+    plt.clf()
+    plt.figure(9)
+    plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o',label=bosonName)
+    
+    plt.figure(0)
+    
+
+    return 0
+
+    
     
 def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0):
 
@@ -608,6 +739,17 @@ def make_ControlPlots(config, plotData,dictPlot, bosonName, targetvariable, resu
     resultData, dictResult = make_ResponseCorrectedPlot(config, XRange, YVariance, YResponse, bosonNameLong, targetvariable, resultData, dictResult, minrange,maxrange, stepwidth, ptmin, ptmax)
     resultData, dictResult = make_ResolutionPerpPlot(config, plotData, dictPlot, bosonNamePerp, targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax) 
     resultData, dictResult = make_ResponsePerpPlot(config, plotData, dictPlot, bosonNamePerp, targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax)
+    
+    if bosonName == "LongZCorrectedRecoil" and "recoMetOnGenMetProjectionPar" in dictPlot and not plotData[dictPlot["recoMetOnGenMetProjectionPar"]].mean() == -999:
+        make_METResponsePlot(config, plotData, dictPlot, "recoMetOnGenMetProjectionPar", targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax)
+        make_METResolutionPlot(config, plotData, dictPlot, "recoMetOnGenMetProjectionPar", targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax) 
+    
+    if bosonName == "recoilslimmedMETs" and "recoPfMetOnGenMetProjectionPar" in dictPlot and not plotData[dictPlot["recoPfMetOnGenMetProjectionPar"]].mean() == -999:
+        make_METResponsePlot(config, plotData, dictPlot, "recoPfMetOnGenMetProjectionPar", targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax)
+        make_METResolutionPlot(config, plotData, dictPlot, "recoPfMetOnGenMetProjectionPar", targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax) 
+    
+    
+    
     return resultData, dictResult
 
     
@@ -977,6 +1119,20 @@ def plot_results(config, plotData, dictPlot):
         #legend.get_frame().set_alpha(0.5)
         plt.savefig(config['outputDir'] + 'ResolutionPerp_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
+        plt.figure(9)
+        plt.xlabel('N Vertex (%i < Boson Pt < %i)'%(min,bosonmax[i]))
+        plt.ylabel('MET/genMET')
+        legend = plt.legend(loc='lower right', shadow=True)
+        #legend.get_frame().set_alpha(0.5)
+        plt.savefig(config['outputDir'] + 'METResponse_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
+        plt.clf()
+        plt.figure(10)
+        plt.xlabel('N Vertex (%i < Boson Pt < %i)'%(min,bosonmax[i]))
+        plt.ylabel('MET - genMET')
+        legend = plt.legend(loc='lower right', shadow=True)
+        #legend.get_frame().set_alpha(0.5)
+        plt.savefig(config['outputDir'] + 'Resolution_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
+        plt.clf()
         plt.figure(0)
         
 
@@ -1041,6 +1197,20 @@ def plot_results(config, plotData, dictPlot):
     legend = plt.legend(loc='lower right', shadow=True)
     #legend.get_frame().set_alpha(0.5)
     plt.savefig(config['outputDir'] + 'ResolutionPerp_vs_BosonPt')
+    plt.clf()
+    plt.figure(9)
+    legend = plt.legend(loc='lower right', shadow=True)
+    #legend.get_frame().set_alpha(0.5)
+    plt.xlabel('Boson Pt')
+    plt.ylabel('MET/genMET')
+    plt.savefig(config['outputDir'] + 'METResponse_vs_BosonPt')
+    plt.clf()
+    plt.figure(10)
+    plt.xlabel('Boson Pt')
+    plt.ylabel('MET - genMET')
+    legend = plt.legend(loc='lower right', shadow=True)
+    #legend.get_frame().set_alpha(0.5)
+    plt.savefig(config['outputDir'] + 'METResolution_vs_BosonPt')
     plt.clf()
     plt.figure(0)
 	    

@@ -17,7 +17,9 @@ def Treecopy(channel, inputfile, outputfileRoot):
         
         
     
-    branches = ["mvamet","met",
+    branches = ["mvamet","mvametphi", 
+                "met","metphi",
+                "mvaMetSumEt", "pfMetSumEt",
                 "recoMetPar","recoMetPerp","recoMetPhi",
                 "recoPfMetPar","recoPfMetPerp","recoPfMetPhi",
                 "recoilPar","recoilPerp","recoilPhi",
@@ -25,7 +27,7 @@ def Treecopy(channel, inputfile, outputfileRoot):
                 "recoMetOnGenMetProjectionPar","recoMetOnGenMetProjectionPerp","recoMetOnGenMetProjectionPhi",
                 "recoPfMetOnGenMetProjectionPar","recoPfMetOnGenMetProjectionPerp","recoPfMetOnGenMetProjectionPhi",    
                 "genMetSumEt","genMetPt","genMetPhi",
-                "npv","njets","iso_1","iso_2","ptvis"
+                "npv","npu","njets","iso_1","iso_2","ptvis"
                     ]
 
     for b in tree.GetListOfBranches():
