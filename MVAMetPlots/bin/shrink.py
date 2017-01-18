@@ -4,7 +4,8 @@ import argparse
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 import sys
-
+import ntpath
+import os
 
 def Treecopy(channel, inputfile, outputfileRoot):
 
@@ -97,18 +98,33 @@ if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='Shrink Kappa files down to necessary plotting variables of MVAMet.')
     parser.add_argument('-i', '--inputfile', default='/storage/jbod/nzaeh/2016-12-13/Gridoutput/merged/MC.root', help='Path to input root file to be skimmed.')
-    parser.add_argument('-o', '--outputfile', default='/storage/jbod/nzaeh/2016-12-13/Gridoutput/MCslimmed.root', help='Path to outputfile/directory + filename.')
+    parser.add_argument('-o', '--outputdir', default='<inputdir>', help='Path to outputdirectory.')
+    parser.add_argument('-of', '--outputfile', default='<oldname>_slimmed.root', help='Outputfilename.')
     parser.add_argument('-c', '--channels', nargs='*', default=['mm', 'mt'], help='Foldername in which to search for ntuples.')
-    args = parser.parse_args()
     parser.add_argument('-m', '--filemode', default='RECREATE', help='create new or add. RECREATE = new file, UPDATE = add to file')
     args = parser.parse_args()
 
-    print('Skimming %s in folder %s in %s mode and saving in %s' %(args.inputfile,args.channels,args.filemode,args.outputfile))
+    
+    if args.outputdir == '<inputdir>':
+        outputfiledir = os.path.dirname(args.inputfile) + "/"
+    else:
+        outputfiledir = args.outputdir
+        
+    if args.outputfile == '<oldname>_slimmed.root':
+        outputfilename = ntpath.basename(args.inputfile)
+        outputfilename = outputfilename[:-5]
+        outputfilename = outputfilename + "_slimmed.root"
+    else:
+        outputfilename = args.outputfile
+        
+    outputfile = outputfiledir + outputfilename
+    print('Skimming %s in channel %s in %s mode and saving in %s' %(args.inputfile,args.channels,args.filemode,outputfile))
 
+    
     inputfile = ROOT.TFile.Open(args.inputfile)
     
 
-    fileout = ROOT.TFile.Open(args.outputfile,args.filemode)
+    fileout = ROOT.TFile.Open(outputfile,args.filemode)
     
     for channel in args.channels:
         fileout = Treecopy(channel, inputfile, fileout)
