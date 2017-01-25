@@ -262,9 +262,16 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, res
 		plt.ylabel('(MET Boson PT_Long) - (True Boson Pt)')
 		plt.plot(bins, y, 'r--')
 		if ptmax == 0:
-		    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/Resolution_%s_vs_%s_%i.png' %(bosonName,targetvariable, index)))
+		    foldername = 'Resolution_%s_vs_%s' %(bosonName,targetvariable)
+                    if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                        os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+                    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
 		else:
-		    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/Resolution(%i<Pt<%i)_%s_vs_%s_%i.png' %(ptmin,ptmax,bosonName,targetvariable, index)))
+		    foldername = 'Resolution(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
+                    if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                        os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+                    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
+                    
 		    
     plt.clf()
     plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o')
@@ -363,10 +370,16 @@ def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, 
 		plt.ylabel('(MET) - (gen MET)')
 		plt.plot(bins, y, 'r--')
 		if ptmax == 0:
-		    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/METResolution_%s_vs_%s_%i.png' %(bosonName,targetvariable, index)))
+		    foldername = 'METResolution_%s_vs_%s' %(bosonName,targetvariable)
+                    if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                        os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+                    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
 		else:
-		    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/METResolution(%i<Pt<%i)_%s_vs_%s_%i.png' %(ptmin,ptmax,bosonName,targetvariable, index)))
-		    
+                    foldername = 'METResolution(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
+                    if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                        os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+                    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
+                        
     plt.clf()
     plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o')
     plt.ylabel('(MET) - (gen MET)')
@@ -422,9 +435,15 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resu
 	    plt.ylabel('(MET Boson PT_Long)/(True Boson Pt)')
 	    plt.plot(bins, y, 'r--')
 	    if ptmax == 0:
-		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/Response_%s_vs_%s_%i.png' %(bosonName,targetvariable, index)))
+		foldername = 'Response_%s_vs_%s' %(bosonName,targetvariable)
+                if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+                plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
 	    else:
-		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/Response(%i<Pt<%i)_%s_vs_%s_%i.png' %(ptmin,ptmax,bosonName,targetvariable, index)))
+		foldername = 'Response(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
+                if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+                plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
     plt.clf()
     plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o')
 
@@ -515,9 +534,16 @@ def make_METResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, r
 	    plt.ylabel('(MET)/(gen MET)')
 	    plt.plot(bins, y, 'r--')
 	    if ptmax == 0:
-		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/METResponse_%s_vs_%s_%i.png' %(bosonName,targetvariable, index)))
+		foldername = 'METResponse_%s_vs_%s' %(bosonName,targetvariable)
+                if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+                plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))        
 	    else:
-		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/METResponse(%i<Pt<%i)_%s_vs_%s_%i.png' %(ptmin,ptmax,bosonName,targetvariable, index)))
+                foldername = 'METResponse(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
+                if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+                plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))                    
+
     plt.clf()
     plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o')
 
@@ -581,9 +607,15 @@ def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable,
 		plt.ylabel('MET Boson PT_Perp')
 		plt.plot(bins, y, 'r--')
 		if ptmax == 0:
-		    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/ResolutionPerp_%s_vs_%s_%i.png' %(bosonName,targetvariable, index)))
+                    foldername = 'ResolutionPerp_%s_vs_%s' %(bosonName,targetvariable)
+                    if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                        os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+                    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))    
 		else:
-		    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/ResolutionPerp(%i<Pt<%i)_%s_vs_%s_%i.png' %(ptmin,ptmax,bosonName,targetvariable, index)))
+                    foldername = 'ResolutionPerp(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
+                    if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                        os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+                    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))    
 		    
     plt.clf()
     plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o')
@@ -593,6 +625,7 @@ def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable,
 	plt.savefig(config['outputDir'] + "ControlPlots/ResolutionPerp_%s_vs_%s.png" %(bosonName,targetvariable))
     else:
 	plt.savefig(config['outputDir'] + "ControlPlots/ResolutionPerp(%i<Pt<%i)_%s_vs_%s.png" %(ptmin,ptmax,bosonName,targetvariable))
+
     plt.figure(8)
     plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o',label=bosonName)
     plt.figure(0)
@@ -652,6 +685,10 @@ def make_ResponsePerpPlot(config, plotData,dictPlot, bosonName, targetvariable, 
     YStd = np.zeros((XRange.shape[0]-1,1))
     print('Response Perp %s versus %s'%(bosonName,targetvariable))
     
+    #create folder for SingleDistributions
+    if not os.path.exists('ResponsePerp(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)):
+	os.makedirs('ResponsePerp(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable))
+    
     #YValues 
     ignoredEntries = 0
     for index in range(0,XRange.shape[0]-1):
@@ -676,9 +713,15 @@ def make_ResponsePerpPlot(config, plotData,dictPlot, bosonName, targetvariable, 
 	    plt.ylabel('MET Boson PT_Perp')
 	    plt.plot(bins, y, 'r--')
 	    if ptmax == 0:
-		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/ResponsePerp_%s_vs_%s_%i.png' %(bosonName,targetvariable, index)))
+		foldername = 'ResponsePerp_%s_vs_%s' %(bosonName,targetvariable)
+                if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))
 	    else:
-		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/ResponsePerp(%i<Pt<%i)_%s_vs_%s_%i.png' %(ptmin,ptmax,bosonName,targetvariable, index)))
+                foldername = 'ResponsePerp(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
+                if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))
     plt.clf()
     plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o')
 
@@ -1088,12 +1131,12 @@ def plot_results(config, plotData, dictPlot):
         legend = plt.legend(loc='lower right', shadow=True)
         #legend.get_frame().set_alpha(0.5)
         plt.xlabel('N Vertex (%i < Boson Pt < %i)'%(min,bosonmax[i]))
-        plt.ylabel('(MET Boson PT_Long)/(True Boson Pt)')
+        plt.ylabel('(MET Boson Pt_Long)/(Reco Boson Pt)')
         plt.savefig(config['outputDir'] + 'Response_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
         plt.figure(5)
         plt.xlabel('N Vertex (%i < Boson Pt < %i)'%(min,bosonmax[i]))
-        plt.ylabel('(MET Boson PT_Long) - (True Boson Pt)')
+        plt.ylabel('std((MET Boson Pt_Long)/(Reco Boson Pt))')
         legend = plt.legend(loc='lower right', shadow=True)
         #legend.get_frame().set_alpha(0.5)
         plt.savefig(config['outputDir'] + 'Resolution_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
@@ -1114,24 +1157,24 @@ def plot_results(config, plotData, dictPlot):
         plt.clf()
         plt.figure(8)
         plt.xlabel('N Vertex (%i < Boson Pt < %i)'%(min,bosonmax[i]))
-        plt.ylabel('MET Boson PT_Perp')
+        plt.ylabel('std(MET Boson PT_Perp)')
         legend = plt.legend(loc='lower right', shadow=True)
         #legend.get_frame().set_alpha(0.5)
         plt.savefig(config['outputDir'] + 'ResolutionPerp_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
         plt.figure(9)
         plt.xlabel('N Vertex (%i < Boson Pt < %i)'%(min,bosonmax[i]))
-        plt.ylabel('MET/genMET')
+        plt.ylabel('MET_Long/genMET')
         legend = plt.legend(loc='lower right', shadow=True)
         #legend.get_frame().set_alpha(0.5)
         plt.savefig(config['outputDir'] + 'METResponse_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
         plt.figure(10)
         plt.xlabel('N Vertex (%i < Boson Pt < %i)'%(min,bosonmax[i]))
-        plt.ylabel('MET - genMET')
+        plt.ylabel('std(MET_Long/genMET)')
         legend = plt.legend(loc='lower right', shadow=True)
         #legend.get_frame().set_alpha(0.5)
-        plt.savefig(config['outputDir'] + 'Resolution_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
+        plt.savefig(config['outputDir'] + 'METResolution_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
         plt.figure(0)
         
@@ -1167,12 +1210,12 @@ def plot_results(config, plotData, dictPlot):
     legend = plt.legend(loc='lower right', shadow=True)
     #legend.get_frame().set_alpha(0.5)
     plt.xlabel('Boson Pt')
-    plt.ylabel('(MET Boson PT_Long)/(True Boson Pt)')
+    plt.ylabel('(MET Boson Pt_Long)/(Reco Boson Pt)')
     plt.savefig(config['outputDir'] + 'Response_vs_BosonPt')
     plt.clf()
     plt.figure(5)
     plt.xlabel('Boson Pt')
-    plt.ylabel('(MET Boson PT_Long) - (True Boson Pt)')
+    plt.ylabel('std((MET Boson Pt_Long)/(Reco Boson Pt))')
     legend = plt.legend(loc='lower right', shadow=True)
     #legend.get_frame().set_alpha(0.5)
     plt.savefig(config['outputDir'] + 'Resolution_vs_BosonPt')
@@ -1193,7 +1236,7 @@ def plot_results(config, plotData, dictPlot):
     plt.clf()
     plt.figure(8)
     plt.xlabel('Boson Pt')
-    plt.ylabel('MET Boson PT_Perp')
+    plt.ylabel('std(MET Boson PT_Perp)')
     legend = plt.legend(loc='lower right', shadow=True)
     #legend.get_frame().set_alpha(0.5)
     plt.savefig(config['outputDir'] + 'ResolutionPerp_vs_BosonPt')
@@ -1202,12 +1245,12 @@ def plot_results(config, plotData, dictPlot):
     legend = plt.legend(loc='lower right', shadow=True)
     #legend.get_frame().set_alpha(0.5)
     plt.xlabel('Boson Pt')
-    plt.ylabel('MET/genMET')
+    plt.ylabel('MET_Long/genMET')
     plt.savefig(config['outputDir'] + 'METResponse_vs_BosonPt')
     plt.clf()
     plt.figure(10)
     plt.xlabel('Boson Pt')
-    plt.ylabel('MET - genMET')
+    plt.ylabel('std(MET_Long/genMET)')
     legend = plt.legend(loc='lower right', shadow=True)
     #legend.get_frame().set_alpha(0.5)
     plt.savefig(config['outputDir'] + 'METResolution_vs_BosonPt')
@@ -1250,6 +1293,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Make MVAMet control plots.')
     parser.add_argument('-config', '--inputconfig', default='../configs/config.json', help='Path to configurations file')
     parser.add_argument('-i', '--inputfile', default='NaN', help='[optional] Inputfile from which to create the plots from')
+    parser.add_argument('-o', '--outputfolder', default='NaN', help='[optional] Foldername in which to store the plots in')
     args = parser.parse_args()
     print('Used Configfile: ',args.inputconfig)
 
@@ -1260,7 +1304,11 @@ if __name__ == '__main__':
     
     if not args.inputfile == 'NaN':
         config['inputFile'] = args.inputfile
-        
+    
+    if not args.outputfolder == 'NaN':
+        config['outputDir'] = "../plots/" + args.outputfolder + "/"
+    
+    
     print('Inputfile: %s'%config['inputFile'])
     
     main(config)
