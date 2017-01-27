@@ -23,6 +23,9 @@ mpl.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
+from scipy.optimize import curve_fit
+from scipy.stats import chisquare
+
 
 """
 Files are referred to in variable fileName as
@@ -36,6 +39,12 @@ DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 --> 3
 DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 --> 4
 DYJetsToLL_M-50_HT-600toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 --> 5
 """
+
+def gauss(x, *p):
+    A, mu, sigma = p
+    return A*np.exp(-(x-mu)**2/(2.*sigma**2))
+
+
 
 def load_datasetcsv(config):
     #create Treevariable
@@ -250,16 +259,52 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, res
 	    print('current bin ',index,' mean:',currentDistri.mean())
 	    print('current bin ',index,' std:',currentDistri.std())
 	    """
-	    YMean[index] = currentDistri.mean()
-	    YStd[index] = currentDistri.std()
+	    num_bins = 150
+	    
+	    #YMean[index] = currentDistri.mean()
+            #YStd[index] = currentDistri.std()
+            fitDistri = currentDistri[((currentDistri.mean()-4*currentDistri.std())<currentDistri[:]) & (currentDistri[:] <(currentDistri.mean()+4*currentDistri.std()))]
+	    print("Left %i outlier events out for fitting"%(currentDistri.shape[0]-fitDistri.shape[0]))
+	    
+            n, bins, patches = plt.hist(fitDistri, num_bins, facecolor='green', alpha=0.5)
+            
+            XCenter = (bins[:-1] + bins[1:])/2
+            p0 = [1., 0., 1.]
+            coeff, var_matrix = curve_fit(gauss,XCenter,n,p0=p0)
+            #print(gauss(XCenter,*coeff).shape)
+            #print(n.shape)
+            #print(chisquare(gauss(XCenter,*coeff),f_exp=n))
+            #print(chisquare([1,2,3,4,5,6,7,8,9]))
+            #chisquareVal = (n - gauss(XCenter,*coeff))
+            #print(sum(chisquareVal)/coeff[2]**2)
+            #print(gauss(XCenter,*coeff))
+            #print("XCenter")
+            #print(XCenter.shape)
+            #print(XCenter)
+            #print("n")
+            #print(n.shape)
+            #print(n)
+            #print("coeff")
+            #print(coeff)
+            #print(coeff.shape)
+            
+            
+            YMean[index] = coeff[1]#currentDistri.mean()
+            YStd[index] = coeff[2]#currentDistri.std()
+            
+            
+            #YMean[index] = currentDistri.mean()
+            #YStd[index] = currentDistri.std()
 	
 	    if index < 12:
 		plt.clf()
-		num_bins = 50
-		n, bins, patches = plt.hist(currentDistri, num_bins, normed=1, facecolor='green', alpha=0.5)
-		y = mlab.normpdf(bins, currentDistri.mean(), currentDistri.std())
+		
+                n, bins, patches = plt.hist(currentDistri, num_bins, normed=1, facecolor='green', alpha=0.5)
+		#y = mlab.normpdf(bins, currentDistri.mean(), currentDistri.std())
+		y = mlab.normpdf(bins, coeff[1], abs(coeff[2]))
 		plt.xlabel('%s at %f, mean: %f'%(targetvariable,(XRange[index+1]+XRange[index])/2,currentDistri.mean()))
 		plt.ylabel('(MET Boson PT_Long) - (True Boson Pt)')
+		plt.title('DMean: %f , DStd: %f'%(currentDistri.mean()-coeff[1],currentDistri.std()-coeff[2]))
 		plt.plot(bins, y, 'r--')
 		if ptmax == 0:
 		    foldername = 'Resolution_%s_vs_%s' %(bosonName,targetvariable)
@@ -396,7 +441,9 @@ def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, 
     
     return 0
     
-def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0):
+
+
+def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVAMet'):
   
     #XRange = np.arange(plotData[:,targetindex].min(),plotData[:,targetindex].max(),(plotData[:,targetindex].max()-plotData[:,targetindex].min())/nbins)
     if minrange == 42:
@@ -407,9 +454,20 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resu
 	stepwidth = (maxrange-minrange)/20
 	
     XRange = np.arange(minrange,maxrange,stepwidth)
+
     YMean = np.zeros((XRange.shape[0]-1,1))
     YStd = np.zeros((XRange.shape[0]-1,1))
     print('Response %s versus %s'%(bosonName,targetvariable))
+    
+    
+    
+
+    #coeff, var_matrix = curve_fit(gauss, bin_centres, hist, p0=p0)
+
+    # Get the fitted curve
+    #hist_fit = gauss(bin_centres, *coeff)
+
+    
     
     #YValues 
     ignoredEntries = 0
@@ -424,15 +482,53 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resu
 	    YStd[index] = 0
 	else:
 	"""
-	YMean[index] = currentDistri.mean()
-	YStd[index] = currentDistri.std()
+	#YMean[index] = currentDistri.mean()
+	#YStd[index] = currentDistri.std()
+	
+    
+        num_bins = 150
+        #YMean[index] = currentDistri.mean()
+        #YStd[index] = currentDistri.std()
+        fitDistri = currentDistri[((currentDistri.mean()-4*currentDistri.std())<currentDistri[:]) & (currentDistri[:] <(currentDistri.mean()+4*currentDistri.std()))]
+        print("Left %i outlier events out for fitting"%(currentDistri.shape[0]-fitDistri.shape[0]))
+        
+        n, bins, patches = plt.hist(fitDistri, num_bins, facecolor='green', alpha=0.5)
+        
+        XCenter = (bins[:-1] + bins[1:])/2
+        p0 = [1., 0., 1.]
+        coeff, var_matrix = curve_fit(gauss,XCenter,n,p0=p0)
+	
+	YMean[index] = coeff[1]#currentDistri.mean()
+	YStd[index] = coeff[2]#currentDistri.std()
+	meanLoc = coeff[1]
+	stdLoc = abs(coeff[2])
+	
+	print(gauss(XCenter,*coeff).astype(int))
+	print(n.astype(int))
+	print(chisquare(gauss(XCenter,*coeff).astype(int),f_exp=n.astype(int)))
+	chisquareVal = (n - gauss(XCenter,*coeff))
+	print(sum(chisquareVal)/coeff[2]**2)
+	
+	
+	#YMean[index] = currentDistri.mean()
+	#YStd[index] = currentDistri.std()
 	if index < 12:
 	    plt.clf()
-            num_bins = 50
-	    n, bins, patches = plt.hist(currentDistri, num_bins, normed=1, facecolor='green', alpha=0.5)
-	    y = mlab.normpdf(bins, currentDistri.mean(), currentDistri.std())
-	    plt.xlabel('%s at %f, mean: %f'%(targetvariable,(XRange[index+1]+XRange[index])/2,currentDistri.mean()))
-	    plt.ylabel('(MET Boson PT_Long)/(True Boson Pt)')
+
+	    
+	    #y = mlab.normpdf(bins, currentDistri.mean(), currentDistri.std())
+
+            n, bins, patches = plt.hist(currentDistri, num_bins, normed=1, facecolor='green', alpha=0.5)
+            y = mlab.normpdf(bins, meanLoc, stdLoc)
+	    #plt.xlabel('%s at %f, mean: %f'%(targetvariable,(XRange[index+1]+XRange[index])/2,currentDistri.mean()))
+	    plt.xlabel(r'$U_\| / p_t^Z$ at $p_t^Z = %.2f~\mathrm{GeV}$'%((XRange[index+1]+XRange[index])/2))
+	    plt.text(meanLoc+3*stdLoc,0.85*(plt.ylim()[1]-plt.ylim()[0]),r'$\mathrm{Events} = %i$''\n'r'$\mathrm{Outliers} = %.2f~$%%' %(currentDistri.shape[0],(1-fitDistri.shape[0]*1./currentDistri.shape[0])), color = 'k',fontsize=16)
+	    
+            plt.text(meanLoc+3*stdLoc,0.5*(plt.ylim()[1]-plt.ylim()[0]),r'$\mu = %.3f$''\n'r'$\sigma = %.3f~$' %(meanLoc,stdLoc),color = 'k',fontsize=16)
+	    #plt.title('DMean: %f , DStd: %f'%(currentDistri.mean()-coeff[1],currentDistri.std()-coeff[2]))
+	    plt.title('Response %s'%labelname)
+	    #plt.ylabel('(MET Boson PT_Long)/(True Boson Pt)')
+	    plt.ylabel('frequency distribution')
 	    plt.plot(bins, y, 'r--')
 	    if ptmax == 0:
 		foldername = 'Response_%s_vs_%s' %(bosonName,targetvariable)
