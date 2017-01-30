@@ -227,7 +227,7 @@ def make_ResponseCorrectedPlot(config, XRange, YStd, YResponse, bosonName, targe
     
     return resultData, dictResult
     
-def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0):
+def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
 
 
     #XRange = np.arange(plotData[:,targetindex].min(),plotData[:,targetindex].max(),(plotData[:,targetindex].max()-plotData[:,targetindex].min())/nbins)
@@ -264,62 +264,53 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, res
 	    #YMean[index] = currentDistri.mean()
             #YStd[index] = currentDistri.std()
             fitDistri = currentDistri[((currentDistri.mean()-4*currentDistri.std())<currentDistri[:]) & (currentDistri[:] <(currentDistri.mean()+4*currentDistri.std()))]
-	    print("Left %i outlier events out for fitting"%(currentDistri.shape[0]-fitDistri.shape[0]))
-	    
+            #print("Left %i outlier events out for fitting"%(currentDistri.shape[0]-fitDistri.shape[0]))
+            
             n, bins, patches = plt.hist(fitDistri, num_bins, facecolor='green', alpha=0.5)
             
             XCenter = (bins[:-1] + bins[1:])/2
             p0 = [1., 0., 1.]
             coeff, var_matrix = curve_fit(gauss,XCenter,n,p0=p0)
-            #print(gauss(XCenter,*coeff).shape)
-            #print(n.shape)
-            #print(chisquare(gauss(XCenter,*coeff),f_exp=n))
-            #print(chisquare([1,2,3,4,5,6,7,8,9]))
-            #chisquareVal = (n - gauss(XCenter,*coeff))
-            #print(sum(chisquareVal)/coeff[2]**2)
-            #print(gauss(XCenter,*coeff))
-            #print("XCenter")
-            #print(XCenter.shape)
-            #print(XCenter)
-            #print("n")
-            #print(n.shape)
-            #print(n)
-            #print("coeff")
-            #print(coeff)
-            #print(coeff.shape)
             
-            
-            YMean[index] = coeff[1]#currentDistri.mean()
-            YStd[index] = coeff[2]#currentDistri.std()
-            
-            
-            #YMean[index] = currentDistri.mean()
-            #YStd[index] = currentDistri.std()
+            YMean[index] = fitDistri.mean()
+            YStd[index] = fitDistri.std()
+            meanLoc = coeff[1]
+            stdLoc = abs(coeff[2])
 	
-	    if index < 12:
-		plt.clf()
-		
-                n, bins, patches = plt.hist(currentDistri, num_bins, normed=1, facecolor='green', alpha=0.5)
-		#y = mlab.normpdf(bins, currentDistri.mean(), currentDistri.std())
-		y = mlab.normpdf(bins, coeff[1], abs(coeff[2]))
-		plt.xlabel('%s at %f, mean: %f'%(targetvariable,(XRange[index+1]+XRange[index])/2,currentDistri.mean()))
-		plt.ylabel('(MET Boson PT_Long) - (True Boson Pt)')
-		plt.title('DMean: %f , DStd: %f'%(currentDistri.mean()-coeff[1],currentDistri.std()-coeff[2]))
-		plt.plot(bins, y, 'r--')
-		if ptmax == 0:
-		    foldername = 'Resolution_%s_vs_%s' %(bosonName,targetvariable)
-                    if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
-                        os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
-                    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
-		else:
-		    foldername = 'Resolution(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
-                    if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
-                        os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
-                    plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
-                    
-		    
+
+
+            plt.clf()
+                
+            #y = mlab.normpdf(bins, currentDistri.mean(), currentDistri.std())
+            plt.rc('font', family='serif')
+            n, bins, patches = plt.hist(currentDistri, num_bins, normed=1, range=[fitDistri.mean()-3*fitDistri.std(), fitDistri.mean()+5*fitDistri.std()], facecolor='green', alpha=0.5)
+            y = mlab.normpdf(bins, meanLoc, stdLoc)
+            #plt.xlabel('%s at %f, mean: %f'%(targetvariable,(XRange[index+1]+XRange[index])/2,currentDistri.mean()))
+            plt.xlabel(r'$U_\| - p_t^Z$ at $%s = %i\,\mathrm{%s}$'%(relateVar,(XRange[index+1]+XRange[index])/2,relateUnits))
+            plt.text(meanLoc+1.5*stdLoc,0.4*(plt.ylim()[1]-plt.ylim()[0]),r'$\mathrm{Events} = %i$''\n'r'$\mathrm{Outliers}(>4\sigma) = %.2f~$%%''\n'r'$\mu_{tot} = %.3f$''\n'r'$\sigma_{tot} = %.3f~$''\n'r'$\mu_{sel} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\sigma_{sel} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\mu_{fit} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\sigma_{fit} = %.3f (\Delta_{tot} = %.2f$%%)''\n' %(currentDistri.shape[0],100*(1-fitDistri.shape[0]*1./currentDistri.shape[0]),currentDistri.mean(),currentDistri.std(),fitDistri.mean(),100*(1-fitDistri.mean()/currentDistri.mean()), fitDistri.std(),100*(1-fitDistri.std()/currentDistri.std()), meanLoc,100*(1-meanLoc/currentDistri.mean()),stdLoc,100*(1-stdLoc/currentDistri.std())),color = 'k',fontsize=16)
+            #plt.title('DMean: %f , DStd: %f'%(currentDistri.mean()-coeff[1],currentDistri.std()-coeff[2]))
+            
+            #plt.ylabel('(MET Boson PT_Long)/(True Boson Pt)')
+            plt.ylabel('frequency distribution')
+        
+            if ptmax == 0:
+                plt.title('Resolution %s'%labelname)
+                plt.plot(bins, y, 'r--')
+                foldername = 'Resolution_%s_vs_%s' %(bosonName,targetvariable)
+                if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+                plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
+            else:
+                plt.title('Resolution %s 'r'$(%i\,\mathrm{GeV}<p_t^Z<%i\,\mathrm{GeV})$'%(labelname,ptmin,ptmax))
+                plt.plot(bins, y, 'r--')
+                foldername = 'Resolution(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
+                if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+                plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
+                
+                
     plt.clf()
-    plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o')
+    plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o-')
     plt.ylabel('(MET Boson PT_Long) - (True Boson Pt)')
     plt.xlabel(targetvariable)
     if ptmax == 0:
@@ -327,7 +318,7 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, res
     else:
 	plt.savefig(config['outputDir'] + "ControlPlots/Resolution(%i<Pt<%i)_%s_vs_%s.png" %(ptmin,ptmax,bosonName,targetvariable))
     plt.figure(5)
-    plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o',label=bosonName)
+    plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o-',label=labelname)
     plt.figure(0)
     plt.clf()
     
@@ -434,7 +425,7 @@ def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, 
     else:
 	plt.savefig(config['outputDir'] + "ControlPlots/METResolution(%i<Pt<%i)_%s_vs_%s.png" %(ptmin,ptmax,bosonName,targetvariable))
     plt.figure(10)
-    plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o',label=bosonName)
+    plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o-',label=bosonName)
     plt.figure(0)
     plt.clf()
     
@@ -443,7 +434,7 @@ def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, 
     
 
 
-def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVAMet'):
+def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
   
     #XRange = np.arange(plotData[:,targetindex].min(),plotData[:,targetindex].max(),(plotData[:,targetindex].max()-plotData[:,targetindex].min())/nbins)
     if minrange == 42:
@@ -490,7 +481,7 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resu
         #YMean[index] = currentDistri.mean()
         #YStd[index] = currentDistri.std()
         fitDistri = currentDistri[((currentDistri.mean()-4*currentDistri.std())<currentDistri[:]) & (currentDistri[:] <(currentDistri.mean()+4*currentDistri.std()))]
-        print("Left %i outlier events out for fitting"%(currentDistri.shape[0]-fitDistri.shape[0]))
+        #print("Left %i outlier events out for fitting"%(currentDistri.shape[0]-fitDistri.shape[0]))
         
         n, bins, patches = plt.hist(fitDistri, num_bins, facecolor='green', alpha=0.5)
         
@@ -498,50 +489,46 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resu
         p0 = [1., 0., 1.]
         coeff, var_matrix = curve_fit(gauss,XCenter,n,p0=p0)
 	
-	YMean[index] = coeff[1]#currentDistri.mean()
-	YStd[index] = coeff[2]#currentDistri.std()
+	YMean[index] = fitDistri.mean()
+	YStd[index] = fitDistri.std()
 	meanLoc = coeff[1]
 	stdLoc = abs(coeff[2])
 	
-	print(gauss(XCenter,*coeff).astype(int))
-	print(n.astype(int))
-	print(chisquare(gauss(XCenter,*coeff).astype(int),f_exp=n.astype(int)))
-	chisquareVal = (n - gauss(XCenter,*coeff))
-	print(sum(chisquareVal)/coeff[2]**2)
-	
+
 	
 	#YMean[index] = currentDistri.mean()
 	#YStd[index] = currentDistri.std()
-	if index < 12:
-	    plt.clf()
+        plt.clf()
 
-	    
-	    #y = mlab.normpdf(bins, currentDistri.mean(), currentDistri.std())
+        
+        #y = mlab.normpdf(bins, currentDistri.mean(), currentDistri.std())
+        plt.rc('font', family='serif')
+        n, bins, patches = plt.hist(currentDistri, num_bins, normed=1, range=[fitDistri.mean()-3*fitDistri.std(), fitDistri.mean()+5*fitDistri.std()], facecolor='green', alpha=0.5)
+        y = mlab.normpdf(bins, meanLoc, stdLoc)
+        #plt.xlabel('%s at %f, mean: %f'%(targetvariable,(XRange[index+1]+XRange[index])/2,currentDistri.mean()))
+        plt.xlabel(r'$U_\| / p_t^Z$ at $%s = %i\,\mathrm{%s}$'%(relateVar,(XRange[index+1]+XRange[index])/2,relateUnits))
+        plt.text(meanLoc+1.5*stdLoc,0.4*(plt.ylim()[1]-plt.ylim()[0]),r'$\mathrm{Events} = %i$''\n'r'$\mathrm{Outliers}(>4\sigma) = %.2f~$%%''\n'r'$\mu_{tot} = %.3f$''\n'r'$\sigma_{tot} = %.3f~$''\n'r'$\mu_{sel} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\sigma_{sel} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\mu_{fit} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\sigma_{fit} = %.3f (\Delta_{tot} = %.2f$%%)''\n' %(currentDistri.shape[0],100*(1-fitDistri.shape[0]*1./currentDistri.shape[0]),currentDistri.mean(),currentDistri.std(),fitDistri.mean(),100*(1-fitDistri.mean()/currentDistri.mean()), fitDistri.std(),100*(1-fitDistri.std()/currentDistri.std()), meanLoc,100*(1-meanLoc/currentDistri.mean()),stdLoc,100*(1-stdLoc/currentDistri.std())),color = 'k',fontsize=16)
+        #plt.title('DMean: %f , DStd: %f'%(currentDistri.mean()-coeff[1],currentDistri.std()-coeff[2]))
 
-            n, bins, patches = plt.hist(currentDistri, num_bins, normed=1, facecolor='green', alpha=0.5)
-            y = mlab.normpdf(bins, meanLoc, stdLoc)
-	    #plt.xlabel('%s at %f, mean: %f'%(targetvariable,(XRange[index+1]+XRange[index])/2,currentDistri.mean()))
-	    plt.xlabel(r'$U_\| / p_t^Z$ at $p_t^Z = %.2f~\mathrm{GeV}$'%((XRange[index+1]+XRange[index])/2))
-	    plt.text(meanLoc+3*stdLoc,0.85*(plt.ylim()[1]-plt.ylim()[0]),r'$\mathrm{Events} = %i$''\n'r'$\mathrm{Outliers} = %.2f~$%%' %(currentDistri.shape[0],(1-fitDistri.shape[0]*1./currentDistri.shape[0])), color = 'k',fontsize=16)
-	    
-            plt.text(meanLoc+3*stdLoc,0.5*(plt.ylim()[1]-plt.ylim()[0]),r'$\mu = %.3f$''\n'r'$\sigma = %.3f~$' %(meanLoc,stdLoc),color = 'k',fontsize=16)
-	    #plt.title('DMean: %f , DStd: %f'%(currentDistri.mean()-coeff[1],currentDistri.std()-coeff[2]))
-	    plt.title('Response %s'%labelname)
-	    #plt.ylabel('(MET Boson PT_Long)/(True Boson Pt)')
-	    plt.ylabel('frequency distribution')
-	    plt.plot(bins, y, 'r--')
-	    if ptmax == 0:
-		foldername = 'Response_%s_vs_%s' %(bosonName,targetvariable)
-                if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
-                    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
-                plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
-	    else:
-		foldername = 'Response(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
-                if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
-                    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
-                plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
+        #plt.ylabel('(MET Boson PT_Long)/(True Boson Pt)')
+        plt.ylabel('frequency distribution')
+        
+        if ptmax == 0:
+            plt.title('Response %s'%labelname)
+            plt.plot(bins, y, 'r--')
+            foldername = 'Response_%s_vs_%s' %(bosonName,targetvariable)
+            if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+            plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
+        else:
+            plt.title('Response %s 'r'$(%i\,\mathrm{GeV}<p_t^Z<%i\,\mathrm{GeV})$'%(labelname,ptmin,ptmax))
+            plt.plot(bins, y, 'r--')
+            foldername = 'Response(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
+            if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
+                os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
+            plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
     plt.clf()
-    plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o')
+    plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o-')
 
     plt.xlabel(targetvariable)
     if ptmax == 0:
@@ -550,7 +537,7 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resu
 	plt.savefig(config['outputDir'] + "ControlPlots/Response(%i<Pt<%i)_%s_vs_%s.png" %(ptmin,ptmax,bosonName,targetvariable))
     plt.clf()
     plt.figure(4)
-    plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o',label=bosonName)
+    plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o-',label=labelname)
     
     plt.figure(0)
     
@@ -781,9 +768,6 @@ def make_ResponsePerpPlot(config, plotData,dictPlot, bosonName, targetvariable, 
     YStd = np.zeros((XRange.shape[0]-1,1))
     print('Response Perp %s versus %s'%(bosonName,targetvariable))
     
-    #create folder for SingleDistributions
-    if not os.path.exists('ResponsePerp(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)):
-	os.makedirs('ResponsePerp(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable))
     
     #YValues 
     ignoredEntries = 0
@@ -866,15 +850,15 @@ def make_ResponsePerpPlot(config, plotData,dictPlot, bosonName, targetvariable, 
 
     
 
-def make_ControlPlots(config, plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin=0,ptmax=0):
+def make_ControlPlots(config, plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin=0,ptmax=0, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
 
     bosonNameLong = bosonName + '_LongZ'
     bosonNamePerp = bosonName + '_PerpZ'
     maxrange += stepwidth
     if not os.path.exists((config['outputDir'] + 'ControlPlots/SingleDistributions/')):
 	os.makedirs((config['outputDir'] + 'ControlPlots/SingleDistributions/'))
-    resultData, dictResult, XRange, YVariance = make_ResolutionPlot(config, plotData, dictPlot, bosonNameLong, targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax) 
-    resultData, dictResult, YResponse = make_ResponsePlot(config, plotData, dictPlot, bosonNameLong, targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax)
+    resultData, dictResult, XRange, YVariance = make_ResolutionPlot(config, plotData, dictPlot, bosonNameLong, targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits) 
+    resultData, dictResult, YResponse = make_ResponsePlot(config, plotData, dictPlot, bosonNameLong, targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
     resultData, dictResult = make_ResponseCorrectedPlot(config, XRange, YVariance, YResponse, bosonNameLong, targetvariable, resultData, dictResult, minrange,maxrange, stepwidth, ptmin, ptmax)
     resultData, dictResult = make_ResolutionPerpPlot(config, plotData, dictPlot, bosonNamePerp, targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax) 
     resultData, dictResult = make_ResponsePerpPlot(config, plotData, dictPlot, bosonNamePerp, targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax)
@@ -1207,69 +1191,75 @@ def plot_results(config, plotData, dictPlot):
     
             #BDT
             if 'LongZCorrectedRecoil_LongZ' in dictPlot:
-                resultData, dictResult = make_ControlPlots(config, slicedData, dictPlot, 'LongZCorrectedRecoil', 'NVertex',resultData, dictResult, 5,40,5,min,bosonmax[i])
+                resultData, dictResult = make_ControlPlots(config, slicedData, dictPlot, 'LongZCorrectedRecoil', 'NVertex',resultData, dictResult, 5,40,5,min,bosonmax[i],'MVAMet','\# PV','')
             
             if 'PhiCorrectedRecoil_LongZ' in dictPlot:
-                resultData, dictResult = make_ControlPlots(config, slicedData, dictPlot, 'PhiCorrectedRecoil', 'NVertex',resultData, dictResult, 5,40,5,min,bosonmax[i])
+                resultData, dictResult = make_ControlPlots(config, slicedData, dictPlot, 'PhiCorrectedRecoil', 'NVertex',resultData, dictResult, 5,40,5,min,bosonmax[i],'MVAMet Phi Corrected','\# PV','')
             
         
         
         
         #slimmedMet
         if 'recoilslimmedMETs_LongZ' in dictPlot:
-            resultData, dictResult = make_ControlPlots(config, slicedData, dictPlot, 'recoilslimmedMETs', 'NVertex',resultData, dictResult, 5,40,5,min,bosonmax[i])
+            resultData, dictResult = make_ControlPlots(config, slicedData, dictPlot, 'recoilslimmedMETs', 'NVertex',resultData, dictResult, 5,40,5,min,bosonmax[i],'PFMet','\# PV','')
         
         #Puppi-Met
         if 'recoilslimmedMETsPuppi_LongZ' in dictPlot:
-            resultData, dictResult = make_ControlPlots(config, slicedData, dictPlot, 'recoilslimmedMETsPuppi', 'NVertex',resultData, dictResult, 5,40,5,min,bosonmax[i])
-        
-        plt.figure(4)
-        legend = plt.legend(loc='lower right', shadow=True)
-        #legend.get_frame().set_alpha(0.5)
-        plt.xlabel('N Vertex (%i < Boson Pt < %i)'%(min,bosonmax[i]))
-        plt.ylabel('(MET Boson Pt_Long)/(Reco Boson Pt)')
+            resultData, dictResult = make_ControlPlots(config, slicedData, dictPlot, 'recoilslimmedMETsPuppi', 'NVertex',resultData, dictResult, 5,40,5,min,bosonmax[i],'PuppiMet','\# PV','')
+       
+	plt.clf()
+	plt.figure(4) 
+        plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]))
+    	plt.ylabel(r'$<U_\| / p_t^Z>$')
+    	plt.title('Response 'r'$U_\|$'' vs 'r'#PV')
+        legend = plt.legend(loc='best', shadow=True)
+    	plt.plot((plt.xlim()[0], plt.xlim()[1]), (1, 1), 'k--')
         plt.savefig(config['outputDir'] + 'Response_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
+
         plt.figure(5)
-        plt.xlabel('N Vertex (%i < Boson Pt < %i)'%(min,bosonmax[i]))
-        plt.ylabel('std((MET Boson Pt_Long)/(Reco Boson Pt))')
-        legend = plt.legend(loc='lower right', shadow=True)
-        #legend.get_frame().set_alpha(0.5)
+        plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]))
+    	plt.ylabel(r'$\sigma(<U_\| - p_t^Z>)$'' in GeV')
+    	plt.title('Resolution 'r'$U_\|$'' vs 'r'#PV')
+        legend = plt.legend(loc='best', shadow=True)
         plt.savefig(config['outputDir'] + 'Resolution_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
+
         plt.figure(6)
-        plt.xlabel('N Vertex (%i < Boson Pt < %i)'%(min,bosonmax[i]))
+        plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]))
         plt.ylabel('Resolution / Response')
-        legend = plt.legend(loc='lower right', shadow=True)
-        #legend.get_frame().set_alpha(0.5)
+    	plt.title('Response Corrected vs 'r'#PV')
+        legend = plt.legend(loc='best', shadow=True)
         plt.savefig(config['outputDir'] + 'ResponseCorrected_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
+
         plt.figure(7)
-        legend = plt.legend(loc='lower right', shadow=True)
-        #legend.get_frame().set_alpha(0.5)
-        plt.xlabel('N Vertex (%i < Boson Pt < %i)'%(min,bosonmax[i]))
-        plt.ylabel('MET Boson PT_Perp')
+        legend = plt.legend(loc='best', shadow=True)
+        plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]))
+    	plt.ylabel(r'$<U_\bot>$')
+    	plt.title('Response 'r'$U_\bot$'' vs 'r'#PV')
         plt.savefig(config['outputDir'] + 'ResponsePerp_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
+
         plt.figure(8)
-        plt.xlabel('N Vertex (%i < Boson Pt < %i)'%(min,bosonmax[i]))
-        plt.ylabel('std(MET Boson PT_Perp)')
-        legend = plt.legend(loc='lower right', shadow=True)
-        #legend.get_frame().set_alpha(0.5)
+        plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]))
+    	plt.ylabel(r'$\sigma(<U_\bot>)$')
+    	plt.title('Resolution 'r'$U_\bot$'' vs 'r'#PV')
+        legend = plt.legend(loc='best', shadow=True)
         plt.savefig(config['outputDir'] + 'ResolutionPerp_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
+
         plt.figure(9)
-        plt.xlabel('N Vertex (%i < Boson Pt < %i)'%(min,bosonmax[i]))
+        plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]))
         plt.ylabel('MET_Long/genMET')
-        legend = plt.legend(loc='lower right', shadow=True)
-        #legend.get_frame().set_alpha(0.5)
+        legend = plt.legend(loc='best', shadow=True)
         plt.savefig(config['outputDir'] + 'METResponse_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
+
         plt.figure(10)
-        plt.xlabel('N Vertex (%i < Boson Pt < %i)'%(min,bosonmax[i]))
         plt.ylabel('std(MET_Long/genMET)')
-        legend = plt.legend(loc='lower right', shadow=True)
-        #legend.get_frame().set_alpha(0.5)
+        plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]))
+        legend = plt.legend(loc='best', shadow=True)
         plt.savefig(config['outputDir'] + 'METResolution_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
         plt.figure(0)
@@ -1286,68 +1276,75 @@ def plot_results(config, plotData, dictPlot):
     
 
     if 'recoilslimmedMETs_LongZ' in dictPlot:
-        resultData, dictResult = make_ControlPlots(config, plotData, dictPlot, 'recoilslimmedMETs',                       'Boson_Pt',resultData, dictResult, 10,200,10,0,0)
+        resultData, dictResult = make_ControlPlots(config, plotData, dictPlot, 'recoilslimmedMETs', 'Boson_Pt',resultData, dictResult, 10,200,10,0,0,'PFMet','p_t^Z','GeV')
     
     if plotconfig['plotBDTPerformance']:
         if 'LongZCorrectedRecoil_LongZ' in dictPlot:
-            resultData, dictResult = make_ControlPlots(config, plotData, dictPlot, 'LongZCorrectedRecoil', 'Boson_Pt',resultData, dictResult, 10,200,10,0,0)
+            resultData, dictResult = make_ControlPlots(config, plotData, dictPlot, 'LongZCorrectedRecoil', 'Boson_Pt',resultData, dictResult, 10,200,10,0,0,'MVAMet','p_t^Z','GeV')
         if 'PhiCorrectedRecoil_LongZ' in dictPlot:
-            resultData, dictResult = make_ControlPlots(config, plotData, dictPlot, 'PhiCorrectedRecoil', 'Boson_Pt',resultData, dictResult, 10,200,10,0,0)
+            resultData, dictResult = make_ControlPlots(config, plotData, dictPlot, 'PhiCorrectedRecoil', 'Boson_Pt',resultData, dictResult, 10,200,10,0,0,'MVAMet Phi Corrected','p_t^Z','GeV')
         if plotconfig['plotAdditionalBDTPlots']:
             make_MoreBDTPlots(config, plotData, dictPlot)
 
     
     
     if 'recoilslimmedMETsPuppi_LongZ' in dictPlot:
-        resultData, dictResult = make_ControlPlots(config, plotData, dictPlot, 'recoilslimmedMETsPuppi', 'Boson_Pt',resultData, dictResult, 10,200,10,0,0)
+        resultData, dictResult = make_ControlPlots(config, plotData, dictPlot, 'recoilslimmedMETsPuppi', 'Boson_Pt',resultData, dictResult, 10,200,10,0,0,'PuppiMet','p_t^Z','GeV')
 
 
     plt.figure(4)
-    legend = plt.legend(loc='lower right', shadow=True)
+    legend = plt.legend(loc='best', shadow=True)
     #legend.get_frame().set_alpha(0.5)
-    plt.xlabel('Boson Pt')
-    plt.ylabel('(MET Boson Pt_Long)/(Reco Boson Pt)')
+    plt.xlabel(r'$p_t^Z$'' in GeV')
+    plt.ylabel(r'$<U_\| / p_t^Z>$')
+    plt.title('Response 'r'$U_\|$'' vs 'r'$p_t^Z$')
+    plt.plot((plt.xlim()[0], plt.xlim()[1]), (1, 1), 'k--')
     plt.savefig(config['outputDir'] + 'Response_vs_BosonPt')
     plt.clf()
     plt.figure(5)
-    plt.xlabel('Boson Pt')
-    plt.ylabel('std((MET Boson Pt_Long)/(Reco Boson Pt))')
-    legend = plt.legend(loc='lower right', shadow=True)
+    plt.xlabel(r'$p_t^Z$'' in GeV')
+    plt.ylabel(r'$\sigma(<U_\| - p_t^Z>)$'' in GeV')
+    plt.title('Resolution 'r'$U_\|$'' vs 'r'$p_t^Z$')
+    legend = plt.legend(loc='best', shadow=True)
     #legend.get_frame().set_alpha(0.5)
     plt.savefig(config['outputDir'] + 'Resolution_vs_BosonPt')
     plt.clf()
     plt.figure(6)
-    plt.xlabel('Boson Pt')
+    plt.xlabel(r'$p_t^Z$'' in GeV')
     plt.ylabel('Resolution / Response')
-    legend = plt.legend(loc='lower right', shadow=True)
+    plt.title('Response Corrected vs 'r'$p_t^Z$')
+    legend = plt.legend(loc='best', shadow=True)
     #legend.get_frame().set_alpha(0.5)
     plt.savefig(config['outputDir'] + 'ResponseCorrected_vs_BosonPt')
     plt.clf()
     plt.figure(7)
-    legend = plt.legend(loc='lower right', shadow=True)
+    legend = plt.legend(loc='best', shadow=True)
     #legend.get_frame().set_alpha(0.5)
-    plt.xlabel('Boson Pt')
-    plt.ylabel('MET Boson PT_Perp')
+    plt.xlabel(r'$p_t^Z$'' in GeV')
+    plt.ylabel(r'$<U_\bot>$')
+    plt.title('Response 'r'$U_\bot$'' vs 'r'$p_t^Z$')
     plt.savefig(config['outputDir'] + 'ResponsePerp_vs_BosonPt')
     plt.clf()
     plt.figure(8)
-    plt.xlabel('Boson Pt')
-    plt.ylabel('std(MET Boson PT_Perp)')
-    legend = plt.legend(loc='lower right', shadow=True)
+    plt.xlabel(r'$p_t^Z$'' in GeV')
+    plt.ylabel(r'$\sigma(<U_\bot>)$')
+    plt.title('Resolution 'r'$U_\bot$'' vs 'r'$p_t^Z$')
+    legend = plt.legend(loc='best', shadow=True)
     #legend.get_frame().set_alpha(0.5)
     plt.savefig(config['outputDir'] + 'ResolutionPerp_vs_BosonPt')
     plt.clf()
     plt.figure(9)
-    legend = plt.legend(loc='lower right', shadow=True)
+    legend = plt.legend(loc='best', shadow=True)
     #legend.get_frame().set_alpha(0.5)
-    plt.xlabel('Boson Pt')
-    plt.ylabel('MET_Long/genMET')
+    plt.xlabel(r'$p_t^Z$'' in GeV')
+    #plt.ylabel('MET_Long/genMET')
+    #plt.ylabel(r'$\ensuremath{{\not\mathrel{E}}_T}$')
     plt.savefig(config['outputDir'] + 'METResponse_vs_BosonPt')
     plt.clf()
     plt.figure(10)
-    plt.xlabel('Boson Pt')
+    plt.xlabel(r'$p_t^Z$'' in GeV')
     plt.ylabel('std(MET_Long/genMET)')
-    legend = plt.legend(loc='lower right', shadow=True)
+    legend = plt.legend(loc='best', shadow=True)
     #legend.get_frame().set_alpha(0.5)
     plt.savefig(config['outputDir'] + 'METResolution_vs_BosonPt')
     plt.clf()
