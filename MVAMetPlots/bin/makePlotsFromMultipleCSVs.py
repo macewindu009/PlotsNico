@@ -286,7 +286,7 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, res
             n, bins, patches = plt.hist(currentDistri, num_bins, normed=1, range=[fitDistri.mean()-3*fitDistri.std(), fitDistri.mean()+5*fitDistri.std()], facecolor='green', alpha=0.5)
             y = mlab.normpdf(bins, meanLoc, stdLoc)
             #plt.xlabel('%s at %f, mean: %f'%(targetvariable,(XRange[index+1]+XRange[index])/2,currentDistri.mean()))
-            plt.xlabel(r'$U_\| - p_t^Z$ at $%s = %i\,\mathrm{%s}$'%(relateVar,(XRange[index+1]+XRange[index])/2,relateUnits))
+            plt.xlabel(r'$U_\| - p_t^Z$ at $%s = (%i - %i)\,\mathrm{%s}$'%(relateVar,XRange[index],XRange[index+1],relateUnits))
             plt.text(meanLoc+1.5*stdLoc,0.4*(plt.ylim()[1]-plt.ylim()[0]),r'$\mathrm{Events} = %i$''\n'r'$\mathrm{Outliers}(>4\sigma) = %.2f~$%%''\n'r'$\mu_{tot} = %.3f$''\n'r'$\sigma_{tot} = %.3f~$''\n'r'$\mu_{sel} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\sigma_{sel} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\mu_{fit} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\sigma_{fit} = %.3f (\Delta_{tot} = %.2f$%%)''\n' %(currentDistri.shape[0],100*(1-fitDistri.shape[0]*1./currentDistri.shape[0]),currentDistri.mean(),currentDistri.std(),fitDistri.mean(),100*(1-fitDistri.mean()/currentDistri.mean()), fitDistri.std(),100*(1-fitDistri.std()/currentDistri.std()), meanLoc,100*(1-meanLoc/currentDistri.mean()),stdLoc,100*(1-stdLoc/currentDistri.std())),color = 'k',fontsize=16)
             #plt.title('DMean: %f , DStd: %f'%(currentDistri.mean()-coeff[1],currentDistri.std()-coeff[2]))
             
@@ -506,7 +506,7 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resu
         n, bins, patches = plt.hist(currentDistri, num_bins, normed=1, range=[fitDistri.mean()-3*fitDistri.std(), fitDistri.mean()+5*fitDistri.std()], facecolor='green', alpha=0.5)
         y = mlab.normpdf(bins, meanLoc, stdLoc)
         #plt.xlabel('%s at %f, mean: %f'%(targetvariable,(XRange[index+1]+XRange[index])/2,currentDistri.mean()))
-        plt.xlabel(r'$U_\| / p_t^Z$ at $%s = %i\,\mathrm{%s}$'%(relateVar,(XRange[index+1]+XRange[index])/2,relateUnits))
+        plt.xlabel(r'$U_\| / p_t^Z$ at $%s = (%i - %i)\,\mathrm{%s}$'%(relateVar,XRange[index],XRange[index+1],relateUnits))
         plt.text(meanLoc+1.5*stdLoc,0.4*(plt.ylim()[1]-plt.ylim()[0]),r'$\mathrm{Events} = %i$''\n'r'$\mathrm{Outliers}(>4\sigma) = %.2f~$%%''\n'r'$\mu_{tot} = %.3f$''\n'r'$\sigma_{tot} = %.3f~$''\n'r'$\mu_{sel} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\sigma_{sel} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\mu_{fit} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\sigma_{fit} = %.3f (\Delta_{tot} = %.2f$%%)''\n' %(currentDistri.shape[0],100*(1-fitDistri.shape[0]*1./currentDistri.shape[0]),currentDistri.mean(),currentDistri.std(),fitDistri.mean(),100*(1-fitDistri.mean()/currentDistri.mean()), fitDistri.std(),100*(1-fitDistri.std()/currentDistri.std()), meanLoc,100*(1-meanLoc/currentDistri.mean()),stdLoc,100*(1-stdLoc/currentDistri.std())),color = 'k',fontsize=16)
         #plt.title('DMean: %f , DStd: %f'%(currentDistri.mean()-coeff[1],currentDistri.std()-coeff[2]))
 
