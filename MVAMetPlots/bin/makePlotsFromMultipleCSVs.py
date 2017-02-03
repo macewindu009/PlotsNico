@@ -44,6 +44,9 @@ def gauss(x, *p):
     A, mu, sigma = p
     return A*np.exp(-(x-mu)**2/(2.*sigma**2))
 
+def doublegauss(x, *p):
+    A1, A2, mu1, mu2, sigma1, sigma2 = p
+    return A1*np.exp(-(x-mu1)**2/(2.*sigma1**2)) + A2*np.exp(-(x-mu2)**2/(2.*sigma2**2))
 
 
 def load_datasetcsv(config):
@@ -164,7 +167,7 @@ def make_Plot(variablename, inputData, dictPlot, outputdir):
     return 0
     
     
-def make_ResponseCorrectedPlot(config, XRange, YStd, YResponse, bosonName, targetvariable, resultData, dictResult, minrange,maxrange, stepwidth, ptmin,ptmax):
+def make_ResponseCorrectedPlot(config, XRange, YStd, YResponse, bosonName, targetvariable, resultData, dictResult, minrange,maxrange, stepwidth, ptmin,ptmax, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
 
     plt.clf()
     ResCorr = YStd[:]/YResponse[:]
@@ -176,7 +179,7 @@ def make_ResponseCorrectedPlot(config, XRange, YStd, YResponse, bosonName, targe
     else:
 	  plt.savefig(config['outputDir'] + "ControlPlots/ResponseCorrected(%i<Pt<%i)_%s_vs_%s.png" %(ptmin,ptmax,bosonName,targetvariable))
     plt.figure(6)
-    plt.plot(XRange[:-1]+stepwidth/2.,ResCorr,'o',label=bosonName)
+    plt.plot(XRange[:-1]+stepwidth/2.,ResCorr,'o-',label=labelname)
     plt.figure(0)
     plt.clf()    
     
@@ -259,7 +262,7 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, res
 	    print('current bin ',index,' mean:',currentDistri.mean())
 	    print('current bin ',index,' std:',currentDistri.std())
 	    """
-	    num_bins = 150
+	    num_bins = 100
 	    
 	    #YMean[index] = currentDistri.mean()
             #YStd[index] = currentDistri.std()
@@ -272,6 +275,16 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, res
             p0 = [1., 0., 1.]
             coeff, var_matrix = curve_fit(gauss,XCenter,n,p0=p0)
             
+            chiNormal = ((gauss(XCenter,*coeff)-n)**2/n).sum()
+            chiperDOF = chiNormal/(num_bins-3)
+                    
+            """
+            coeffDouble, var_matrixDouble = curve_fit(doublegauss,XCenter,n,p0=p0)
+            
+            plt.text(meanLoc-2.5*stdLoc,0.4*(plt.ylim()[1]-plt.ylim()[0]),r'$\mu_{2Gauss}^1 = %.2f$''\n'r'$=\sigma_{2Gauss}^1= %.2f$''\n'r'$\mu_{2Gauss}^2 = %.2f$''\n'r'$=\sigma_{2Gauss}^2= %.2f$''\n'%(coeffDouble[1], coeffDouble[2], coeffDouble[4, coeffDouble[5]]),color = 'k',fontsize=16)
+            
+            print(coeffDouble)
+            """
             YMean[index] = fitDistri.mean()
             YStd[index] = fitDistri.std()
             meanLoc = coeff[1]
@@ -287,7 +300,7 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, res
             y = mlab.normpdf(bins, meanLoc, stdLoc)
             #plt.xlabel('%s at %f, mean: %f'%(targetvariable,(XRange[index+1]+XRange[index])/2,currentDistri.mean()))
             plt.xlabel(r'$U_\| - p_t^Z$ at $%s = (%i - %i)\,\mathrm{%s}$'%(relateVar,XRange[index],XRange[index+1],relateUnits))
-            plt.text(meanLoc+1.5*stdLoc,0.4*(plt.ylim()[1]-plt.ylim()[0]),r'$\mathrm{Events} = %i$''\n'r'$\mathrm{Outliers}(>4\sigma) = %.2f~$%%''\n'r'$\mu_{tot} = %.3f$''\n'r'$\sigma_{tot} = %.3f~$''\n'r'$\mu_{sel} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\sigma_{sel} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\mu_{fit} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\sigma_{fit} = %.3f (\Delta_{tot} = %.2f$%%)''\n' %(currentDistri.shape[0],100*(1-fitDistri.shape[0]*1./currentDistri.shape[0]),currentDistri.mean(),currentDistri.std(),fitDistri.mean(),100*(1-fitDistri.mean()/currentDistri.mean()), fitDistri.std(),100*(1-fitDistri.std()/currentDistri.std()), meanLoc,100*(1-meanLoc/currentDistri.mean()),stdLoc,100*(1-stdLoc/currentDistri.std())),color = 'k',fontsize=16)
+            plt.text(meanLoc+1.5*stdLoc,0.4*(plt.ylim()[1]-plt.ylim()[0]),r'$\mathrm{Events} = %i$''\n'r'$\mathrm{Outliers}(>4\sigma) = %.2f~$%%''\n'r'$\mu_{tot} = %.3f$''\n'r'$\sigma_{tot} = %.3f~$''\n'r'$\mu_{sel} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\sigma_{sel} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\mu_{fit} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\sigma_{fit} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\chi_{pDoF}^2 = %.1f$' %(currentDistri.shape[0],100*(1-fitDistri.shape[0]*1./currentDistri.shape[0]),currentDistri.mean(),currentDistri.std(),fitDistri.mean(),(fitDistri.mean()-currentDistri.mean())/currentDistri.std(), fitDistri.std(),(fitDistri.std()-currentDistri.std())/currentDistri.std(), meanLoc,(meanLoc-currentDistri.mean())/currentDistri.std(),stdLoc,(stdLoc-currentDistri.std())/currentDistri.std(),chiperDOF),color = 'k',fontsize=16)
             #plt.title('DMean: %f , DStd: %f'%(currentDistri.mean()-coeff[1],currentDistri.std()-coeff[2]))
             
             #plt.ylabel('(MET Boson PT_Long)/(True Boson Pt)')
@@ -362,7 +375,7 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, res
     return resultData, dictResult, XRange, YStd
 
    
-def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0):
+def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
 
 
     #XRange = np.arange(plotData[:,targetindex].min(),plotData[:,targetindex].max(),(plotData[:,targetindex].max()-plotData[:,targetindex].min())/nbins)
@@ -425,7 +438,7 @@ def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, 
     else:
 	plt.savefig(config['outputDir'] + "ControlPlots/METResolution(%i<Pt<%i)_%s_vs_%s.png" %(ptmin,ptmax,bosonName,targetvariable))
     plt.figure(10)
-    plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o-',label=bosonName)
+    plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o-',label=labelname)
     plt.figure(0)
     plt.clf()
     
@@ -477,7 +490,7 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resu
 	#YStd[index] = currentDistri.std()
 	
     
-        num_bins = 150
+        num_bins = 100
         #YMean[index] = currentDistri.mean()
         #YStd[index] = currentDistri.std()
         fitDistri = currentDistri[((currentDistri.mean()-4*currentDistri.std())<currentDistri[:]) & (currentDistri[:] <(currentDistri.mean()+4*currentDistri.std()))]
@@ -489,25 +502,51 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resu
         p0 = [1., 0., 1.]
         coeff, var_matrix = curve_fit(gauss,XCenter,n,p0=p0)
 	
+	p0Double = [1., 1., 1., 0., 1., 1.]
+	#coeffDouble, var_matrixDouble = curve_fit(doublegauss,XCenter,n,p0=p0Double)
+	
+	#print(gauss(XCenter,*coeff)-n)
+	chiNormal = ((gauss(XCenter,*coeff)-n)**2/n).sum()
+	chiperDOF = chiNormal/(num_bins-3)
+	#chiDouble = ((doublegauss(XCenter,*coeffDouble)-n)**2).sum()
+
+	print("Normal Gauss: %f"%chiNormal)
+	#print("Normal Gauss: %f"%chiDouble)
+	
+	
+	#print(coeffDouble)
+	
 	YMean[index] = fitDistri.mean()
 	YStd[index] = fitDistri.std()
 	meanLoc = coeff[1]
 	stdLoc = abs(coeff[2])
 	
-
+        
 	
 	#YMean[index] = currentDistri.mean()
 	#YStd[index] = currentDistri.std()
         plt.clf()
 
+
+        
         
         #y = mlab.normpdf(bins, currentDistri.mean(), currentDistri.std())
         plt.rc('font', family='serif')
-        n, bins, patches = plt.hist(currentDistri, num_bins, normed=1, range=[fitDistri.mean()-3*fitDistri.std(), fitDistri.mean()+5*fitDistri.std()], facecolor='green', alpha=0.5)
-        y = mlab.normpdf(bins, meanLoc, stdLoc)
+        n, bins, patches = plt.hist(currentDistri, num_bins, range=[fitDistri.mean()-3*fitDistri.std(), fitDistri.mean()+5*fitDistri.std()], facecolor='green', alpha=0.5)
+        #y = mlab.normpdf(bins, meanLoc, stdLoc)
+        #print("y ",y.shape)
+        y = gauss(bins,*coeff)
+        #print("y1 ",y1.shape)
+                
+        	
+        #plt.text(plt.xlim()[0]+0.05*(plt.xlim()[1]-plt.xlim()[0]),0.4*(plt.ylim()[1]-plt.ylim()[0]),r'$\mu_{2Gauss}^1 = %.2f$''\n'r'$=\sigma_{2Gauss}^1= %.2f$''\n'r'$\mu_{2Gauss}^2 = %.2f$''\n'r'$=\sigma_{2Gauss}^2= %.2f$''\n'%(coeffDouble[2], coeffDouble[4], coeffDouble[3], coeffDouble[5]),color = 'k',fontsize=16)
+	
+        
+        
+        
         #plt.xlabel('%s at %f, mean: %f'%(targetvariable,(XRange[index+1]+XRange[index])/2,currentDistri.mean()))
         plt.xlabel(r'$U_\| / p_t^Z$ at $%s = (%i - %i)\,\mathrm{%s}$'%(relateVar,XRange[index],XRange[index+1],relateUnits))
-        plt.text(meanLoc+1.5*stdLoc,0.4*(plt.ylim()[1]-plt.ylim()[0]),r'$\mathrm{Events} = %i$''\n'r'$\mathrm{Outliers}(>4\sigma) = %.2f~$%%''\n'r'$\mu_{tot} = %.3f$''\n'r'$\sigma_{tot} = %.3f~$''\n'r'$\mu_{sel} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\sigma_{sel} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\mu_{fit} = %.3f (\Delta_{tot} = %.2f$%%)''\n'r'$\sigma_{fit} = %.3f (\Delta_{tot} = %.2f$%%)''\n' %(currentDistri.shape[0],100*(1-fitDistri.shape[0]*1./currentDistri.shape[0]),currentDistri.mean(),currentDistri.std(),fitDistri.mean(),100*(1-fitDistri.mean()/currentDistri.mean()), fitDistri.std(),100*(1-fitDistri.std()/currentDistri.std()), meanLoc,100*(1-meanLoc/currentDistri.mean()),stdLoc,100*(1-stdLoc/currentDistri.std())),color = 'k',fontsize=16)
+        plt.text(meanLoc+1.5*stdLoc,0.4*(plt.ylim()[1]-plt.ylim()[0]),r'$\mathrm{Events} = %i$''\n'r'$\mathrm{Outliers}(>4\sigma) = %.2f$%%''\n'r'$\mu_{tot} = %.3f$''\n'r'$\sigma_{tot} = %.3f$''\n'r'$\mu_{sel} = %.3f (\Delta_{tot} = %.2f\sigma_{tot}$)''\n'r'$\sigma_{sel} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\mu_{fit} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\sigma_{fit} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\chi_{pDoF}^2 = %.1f$' %(currentDistri.shape[0],100*(1-fitDistri.shape[0]*1./currentDistri.shape[0]),currentDistri.mean(),currentDistri.std(),fitDistri.mean(),(fitDistri.mean()-currentDistri.mean())/currentDistri.std(), fitDistri.std(),(fitDistri.std()-currentDistri.std())/currentDistri.std(), meanLoc,(meanLoc-currentDistri.mean())/currentDistri.std(),stdLoc,(stdLoc-currentDistri.std())/currentDistri.std(),chiperDOF),color = 'k',fontsize=16)
         #plt.title('DMean: %f , DStd: %f'%(currentDistri.mean()-coeff[1],currentDistri.std()-coeff[2]))
 
         #plt.ylabel('(MET Boson PT_Long)/(True Boson Pt)')
@@ -578,7 +617,7 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resu
     return resultData, dictResult, YMean
 
     
-def make_METResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0):
+def make_METResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
   
     #XRange = np.arange(plotData[:,targetindex].min(),plotData[:,targetindex].max(),(plotData[:,targetindex].max()-plotData[:,targetindex].min())/nbins)
     if minrange == 42:
@@ -637,7 +676,7 @@ def make_METResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, r
 	plt.savefig(config['outputDir'] + "ControlPlots/METResponse(%i<Pt<%i)_%s_vs_%s.png" %(ptmin,ptmax,bosonName,targetvariable))
     plt.clf()
     plt.figure(9)
-    plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o',label=bosonName)
+    plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o-',label=labelname)
     
     plt.figure(0)
     
@@ -646,7 +685,7 @@ def make_METResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, r
 
     
     
-def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0):
+def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
 
 
     #XRange = np.arange(plotData[:,targetindex].min(),plotData[:,targetindex].max(),(plotData[:,targetindex].max()-plotData[:,targetindex].min())/nbins)
@@ -681,6 +720,9 @@ def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable,
 	    YMean[index] = currentDistri.mean()
 	    YStd[index] = currentDistri.std()
 	
+            
+	
+	
 	    if index < 12:
 		plt.clf()
 		num_bins = 50
@@ -710,7 +752,7 @@ def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable,
 	plt.savefig(config['outputDir'] + "ControlPlots/ResolutionPerp(%i<Pt<%i)_%s_vs_%s.png" %(ptmin,ptmax,bosonName,targetvariable))
 
     plt.figure(8)
-    plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o',label=bosonName)
+    plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o-',label=labelname)
     plt.figure(0)
     plt.clf()
     
@@ -753,7 +795,7 @@ def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable,
     
     return resultData, dictResult
     
-def make_ResponsePerpPlot(config, plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0):
+def make_ResponsePerpPlot(config, plotData,dictPlot, bosonName, targetvariable, resultData, dictResult, minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
   
     #XRange = np.arange(plotData[:,targetindex].min(),plotData[:,targetindex].max(),(plotData[:,targetindex].max()-plotData[:,targetindex].min())/nbins)
     if minrange == 42:
@@ -812,7 +854,7 @@ def make_ResponsePerpPlot(config, plotData,dictPlot, bosonName, targetvariable, 
 	plt.savefig(config['outputDir'] + "ControlPlots/ResponsePerp(%i<Pt<%i)_%s_vs_%s.png" %(ptmin,ptmax,bosonName,targetvariable))
     plt.clf()
     plt.figure(7)
-    plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o',label=bosonName)
+    plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o-',label=labelname)
     plt.figure(0)
     
 
@@ -859,17 +901,17 @@ def make_ControlPlots(config, plotData,dictPlot, bosonName, targetvariable, resu
 	os.makedirs((config['outputDir'] + 'ControlPlots/SingleDistributions/'))
     resultData, dictResult, XRange, YVariance = make_ResolutionPlot(config, plotData, dictPlot, bosonNameLong, targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits) 
     resultData, dictResult, YResponse = make_ResponsePlot(config, plotData, dictPlot, bosonNameLong, targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
-    resultData, dictResult = make_ResponseCorrectedPlot(config, XRange, YVariance, YResponse, bosonNameLong, targetvariable, resultData, dictResult, minrange,maxrange, stepwidth, ptmin, ptmax)
-    resultData, dictResult = make_ResolutionPerpPlot(config, plotData, dictPlot, bosonNamePerp, targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax) 
-    resultData, dictResult = make_ResponsePerpPlot(config, plotData, dictPlot, bosonNamePerp, targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax)
+    resultData, dictResult = make_ResponseCorrectedPlot(config, XRange, YVariance, YResponse, bosonNameLong, targetvariable, resultData, dictResult, minrange,maxrange, stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
+    resultData, dictResult = make_ResolutionPerpPlot(config, plotData, dictPlot, bosonNamePerp, targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits) 
+    resultData, dictResult = make_ResponsePerpPlot(config, plotData, dictPlot, bosonNamePerp, targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
     
     if bosonName == "LongZCorrectedRecoil" and "recoMetOnGenMetProjectionPar" in dictPlot and not plotData[dictPlot["recoMetOnGenMetProjectionPar"]].mean() == -999:
-        make_METResponsePlot(config, plotData, dictPlot, "recoMetOnGenMetProjectionPar", targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax)
-        make_METResolutionPlot(config, plotData, dictPlot, "recoMetOnGenMetProjectionPar", targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax) 
+        make_METResponsePlot(config, plotData, dictPlot, "recoMetOnGenMetProjectionPar", targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
+        make_METResolutionPlot(config, plotData, dictPlot, "recoMetOnGenMetProjectionPar", targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits) 
     
     if bosonName == "recoilslimmedMETs" and "recoPfMetOnGenMetProjectionPar" in dictPlot and not plotData[dictPlot["recoPfMetOnGenMetProjectionPar"]].mean() == -999:
-        make_METResponsePlot(config, plotData, dictPlot, "recoPfMetOnGenMetProjectionPar", targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax)
-        make_METResolutionPlot(config, plotData, dictPlot, "recoPfMetOnGenMetProjectionPar", targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax) 
+        make_METResponsePlot(config, plotData, dictPlot, "recoPfMetOnGenMetProjectionPar", targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
+        make_METResolutionPlot(config, plotData, dictPlot, "recoPfMetOnGenMetProjectionPar", targetvariable, resultData, dictResult, minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits) 
     
     
     
@@ -1203,9 +1245,12 @@ def plot_results(config, plotData, dictPlot):
         if 'recoilslimmedMETs_LongZ' in dictPlot:
             resultData, dictResult = make_ControlPlots(config, slicedData, dictPlot, 'recoilslimmedMETs', 'NVertex',resultData, dictResult, 5,40,5,min,bosonmax[i],'PFMet','\# PV','')
         
+        
         #Puppi-Met
         if 'recoilslimmedMETsPuppi_LongZ' in dictPlot:
             resultData, dictResult = make_ControlPlots(config, slicedData, dictPlot, 'recoilslimmedMETsPuppi', 'NVertex',resultData, dictResult, 5,40,5,min,bosonmax[i],'PuppiMet','\# PV','')
+        
+       
        
 	plt.clf()
 	plt.figure(4) 
@@ -1273,11 +1318,6 @@ def plot_results(config, plotData, dictPlot):
     
     
     #Boson PT
-    
-
-    if 'recoilslimmedMETs_LongZ' in dictPlot:
-        resultData, dictResult = make_ControlPlots(config, plotData, dictPlot, 'recoilslimmedMETs', 'Boson_Pt',resultData, dictResult, 10,200,10,0,0,'PFMet','p_t^Z','GeV')
-    
     if plotconfig['plotBDTPerformance']:
         if 'LongZCorrectedRecoil_LongZ' in dictPlot:
             resultData, dictResult = make_ControlPlots(config, plotData, dictPlot, 'LongZCorrectedRecoil', 'Boson_Pt',resultData, dictResult, 10,200,10,0,0,'MVAMet','p_t^Z','GeV')
@@ -1286,10 +1326,19 @@ def plot_results(config, plotData, dictPlot):
         if plotconfig['plotAdditionalBDTPlots']:
             make_MoreBDTPlots(config, plotData, dictPlot)
 
+
+    
+    
+
+    if 'recoilslimmedMETs_LongZ' in dictPlot:
+        resultData, dictResult = make_ControlPlots(config, plotData, dictPlot, 'recoilslimmedMETs', 'Boson_Pt',resultData, dictResult, 10,200,10,0,0,'PFMet','p_t^Z','GeV')
+    
     
     
     if 'recoilslimmedMETsPuppi_LongZ' in dictPlot:
         resultData, dictResult = make_ControlPlots(config, plotData, dictPlot, 'recoilslimmedMETsPuppi', 'Boson_Pt',resultData, dictResult, 10,200,10,0,0,'PuppiMet','p_t^Z','GeV')
+    
+    
 
 
     plt.figure(4)
