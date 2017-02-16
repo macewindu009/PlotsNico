@@ -273,8 +273,11 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, res
             
             XCenter = (bins[:-1] + bins[1:])/2
             p0 = [1., 0., 1.]
-            coeff, var_matrix = curve_fit(gauss,XCenter,n,p0=p0)
-            
+	    try:
+	            coeff, var_matrix = curve_fit(gauss,XCenter,n,p0=p0)
+            except:
+		    coeff = p0
+		    
             chiNormal = ((gauss(XCenter,*coeff)-n)**2/n).sum()
             chiperDOF = chiNormal/(num_bins-3)
                     
@@ -394,7 +397,7 @@ def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, 
     for index in range(0,XRange.shape[0]-1):
 
 	AlternativeDistri = plotData[(XRange[index]<plotData[:,dictPlot[targetvariable]]) & (XRange[index+1]>plotData[:,dictPlot[targetvariable]])]
-	currentDistri = AlternativeDistri[:,dictPlot[bosonName]]+AlternativeDistri[:,dictPlot['genMet_Pt']]
+	currentDistri = AlternativeDistri[:,dictPlot[bosonName]]-AlternativeDistri[:,dictPlot['genMet_Pt']]
 
 	if currentDistri.shape == (0,1):
 	    YMean[index] = 0
@@ -500,8 +503,10 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable, resu
         
         XCenter = (bins[:-1] + bins[1:])/2
         p0 = [1., 0., 1.]
-        coeff, var_matrix = curve_fit(gauss,XCenter,n,p0=p0)
-	
+	try:
+        	coeff, var_matrix = curve_fit(gauss,XCenter,n,p0=p0)
+        except:
+                coeff = p0
 	p0Double = [1., 1., 1., 0., 1., 1.]
 	#coeffDouble, var_matrixDouble = curve_fit(doublegauss,XCenter,n,p0=p0Double)
 	
@@ -1296,13 +1301,14 @@ def plot_results(config, plotData, dictPlot):
 
         plt.figure(9)
         plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]))
-        plt.ylabel('MET_Long/genMET')
+        plt.ylabel(r'$E_{t\|}^{miss}/E_{t,gen}^{miss}$')
         legend = plt.legend(loc='best', shadow=True)
         plt.savefig(config['outputDir'] + 'METResponse_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
 
         plt.figure(10)
         plt.ylabel('std(MET_Long/genMET)')
+        plt.ylabel(r'$\sigma(E_{t\|}^{miss}-E_{t,gen}^{miss})$')
         plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]))
         legend = plt.legend(loc='best', shadow=True)
         plt.savefig(config['outputDir'] + 'METResolution_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
@@ -1387,12 +1393,13 @@ def plot_results(config, plotData, dictPlot):
     #legend.get_frame().set_alpha(0.5)
     plt.xlabel(r'$p_t^Z$'' in GeV')
     #plt.ylabel('MET_Long/genMET')
+    plt.ylabel(r'$E_{t\|}^{miss}/E_{t,gen}^{miss}$')
     #plt.ylabel(r'$\ensuremath{{\not\mathrel{E}}_T}$')
     plt.savefig(config['outputDir'] + 'METResponse_vs_BosonPt')
     plt.clf()
     plt.figure(10)
     plt.xlabel(r'$p_t^Z$'' in GeV')
-    plt.ylabel('std(MET_Long/genMET)')
+    plt.ylabel(r'$\sigma(E_{t\|}^{miss}-E_{t,gen}^{miss})$')
     legend = plt.legend(loc='best', shadow=True)
     #legend.get_frame().set_alpha(0.5)
     plt.savefig(config['outputDir'] + 'METResolution_vs_BosonPt')
