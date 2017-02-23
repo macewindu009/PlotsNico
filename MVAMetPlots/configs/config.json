@@ -21,6 +21,9 @@
                         "npu"
 			],
 			"plotBDTPerformance": true,
-			"plotAdditionalBDTPlots": false
+			"plotAdditionalBDTPlots": false,
+			"plotJetStudyPlots": false,
+			"lowerAlphaCut": 0.2,
+			"upperAlphaCut": 0.8
 		}
 }
