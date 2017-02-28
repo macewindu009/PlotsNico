@@ -1,7 +1,8 @@
 { 
 	"activePlotting" : "plottingdefault",
 		"inputFile": "/storage/jbod/nzaeh/2016-12-13/Gridoutput/merged/mm_Dataslimmed.csv",
-		"outputDir": "../plots/Test/",
+		"outputDir": "../plots/",
+		"outputFolder": "Test",
 		"plottingdefault":
 		{
 			"plotPlotVariables": true,
@@ -20,8 +21,39 @@
                         "genMetSumEt","genMet_Pt","genMet_Phi",
                         "npu"
 			],
+			"inputVariables":
+			[
+			"recoilslimmedMETs_Pt",
+                        "recoilslimmedMETs_Phi",
+                        "recoilslimmedMETs_sumEtFraction",
+                        "recoilslimmedMETsPuppi_Pt",
+                        "recoilslimmedMETsPuppi_Phi",
+                        "recoilslimmedMETsPuppi_sumEtFraction",
+                        "recoilpatpfTrackMET_Pt",
+                        "recoilpatpfTrackMET_Phi",
+                        "recoilpatpfTrackMET_sumEtFraction",
+                        "recoilpatpfPUMET_Pt",
+                        "recoilpatpfPUMET_Phi",
+                        "recoilpatpfPUMET_sumEtFraction",
+                        "recoilpatpfNoPUMET_Pt",
+                        "recoilpatpfNoPUMET_Phi",
+                        "recoilpatpfNoPUMET_sumEtFraction",
+                        "recoilpatpfPUCorrectedMET_sumEtFraction",
+                        "recoilpatpfPUCorrectedMET_Pt",
+                        "recoilpatpfPUCorrectedMET_Phi",
+                        "Jet0_Pt", "Jet0_Eta", "Jet0_Phi",
+                        "Jet1_Pt", "Jet1_Eta", "Jet1_Phi",
+                        "Jet2_Pt", "Jet2_Eta", "Jet2_Phi",
+                        "Jet3_Pt", "Jet3_Eta", "Jet3_Phi",
+                        "Jet4_Pt", "Jet4_Eta", "Jet4_Phi",
+                        "NCleanedJets",
+                        "NVertex"
+			],
 			"plotBDTPerformance": true,
+			"plotPuppiPerformance": true,
+			"plotPhiCorrected": false,
 			"plotAdditionalBDTPlots": false,
+			"plotAdditionalCustomPlots": true,
 			"plotJetStudyPlots": false,
 			"lowerAlphaCut": 0.2,
 			"upperAlphaCut": 0.8
