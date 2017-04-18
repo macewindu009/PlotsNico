@@ -1,0 +1,65 @@
+{
+    "category": null, 
+    "analysis_modules" : ["NormalizeToUnity"],
+    "step": true, 
+    "filename" : "probChiSquare",
+    "y_label" : "arb. Units",
+    "colors": [
+        "goldenrod", 
+        "orange", 
+        "black", 
+        "darkblue"
+    ], 
+    "directories": [
+        "/nfs/dust/cms/user/rfriese/htautau/artus/2016-09-15_22-09_PfMetCov/merged-full/"
+    ], 
+    "energies": [
+        13
+    ], 
+    "files": [
+        "VBFHToTauTauM125_RunIISpring16MiniAODv2reHLT_PUSpring16RAWAODSIM_13TeV_MINIAOD_powheg-pythia8/*.root", 
+        "GluGluHToTauTauM125_RunIISpring16MiniAODv2reHLT_PUSpring16RAWAODSIM_13TeV_MINIAOD_powheg-pythia8/*.root"
+    ], 
+    "folders": [
+        "mt_jecUncNom/ntuple"
+    ], 
+    "labels": [
+        "MVA (qqH)", 
+        "MVA (ggH)", 
+        "PF (qqH)", 
+        "PF (ggH)"
+    ], 
+    "lumis": [
+        12.9
+    ], 
+    "markers": [
+        "."
+    ], 
+    "output_dir": "/afs/desy.de/user/r/rfriese/plots/2016-09-02-MVAMET-thesis/METPlots/thesis-data/mt2016-higgs-performance/plots", 
+    "scale_factors": [
+        12900.0
+    ], 
+    "title": "$H \\rightarrow \\tau \\tau \\rightarrow \\ \\mu \\tau_{had}$", 
+    "weights": [
+        "eventWeight*(nbtag == 0)*(extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(againstMuonTight3_2 > 0.5)*(dilepton_veto < 0.5)*(againstElectronVLooseMVA6_2 > 0.5)*((q_1*q_2)<0.0)"
+    ], 
+    "x_bins": [
+        "40,0,1"
+    ], 
+    "x_expressions": [
+        "probChiSquare",
+        "probChiSquare",
+        "probChiSquarePf",
+        "probChiSquarePf"
+    ], 
+    "x_errors" : [false],
+    "y_errors" : [false],
+    "line_styles": [
+        "-", 
+        "--", 
+        "-", 
+        "--"
+    ], 
+    
+    "x_label": "$prob(\\chi^2)$"
+}

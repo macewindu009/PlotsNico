@@ -1,0 +1,14 @@
+{
+    "y_expressions": [
+		"recoMetOnGenMetProjectionPerp",
+		"recoPfMetOnGenMetProjectionPerp"
+    ], 
+    "y_label": "$E_{\\perp}^{MVA}$",
+    "y_bins": [
+        "50,-100,100"
+    ], 
+    "y_lims": [
+        0, 
+        30.0
+    ]
+}

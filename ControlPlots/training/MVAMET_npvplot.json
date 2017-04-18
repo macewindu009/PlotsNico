@@ -1,0 +1,16 @@
+{
+    "x_bins": [
+        "1 9 11 13 15 17 19 21 29"
+    ], 
+    "x_expressions": [
+        "NVertex"
+    ], 
+    "x_label": "nPV",
+    "weights": [
+        "(select)&&nCombinations==1&&Boson_Pt>50"
+    ],
+    "texts" : "with $p_T^Z > 50 \\mathrm{GeV}$",
+    "texts_size" : "30", 
+    "texts_x" : "0.25",
+    "texts_y" : "0.2"
+}

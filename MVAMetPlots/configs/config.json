@@ -1,4 +1,4 @@
-{ 
+{
 	"activePlotting" : "plottingdefault",
 		"inputFile": "/storage/jbod/nzaeh/2016-12-13/Gridoutput/merged/mm_Dataslimmed.csv",
 		"outputDir": "../plots/",
@@ -11,13 +11,13 @@
 			"plotVariables":
 			[
 			"targetPhiFromSlimmed","targetRecoilFromSlimmed","targetRecoilFromBDT", "Boson_Phi", "Boson_Pt", "recoilslimmedMETsPuppi_Pt", "recoilslimmedMETsPuppi_Phi","recoilslimmedMETsPuppi_LongZ","MVAMET_sumEt","recoilslimmedMETs_Pt", "recoilslimmedMETs_LongZ", "recoilslimmedMETs_Phi", "PhiTrainingResponse", "RecoilTrainingResponse", "PhiCorrectedRecoil_Pt", "PhiCorrectedRecoil_LongZ", "PhiCorrectedRecoil_PerpZ", "PhiCorrectedRecoil_Phi", "PhiCorrectedRecoil_MET", "PhiCorrectedRecoil_METPhi", "LongZCorrectedRecoil_Phi", "LongZCorrectedRecoil_LongZ", "NVertex", "flatPtWeight","flatPtWeightBDT","nCombinations", "fileName","targetX","targetY","Jet0_Pt", "Jet0_Eta", "Jet0_Phi","Jet1_Pt", "Jet1_Eta", "Jet1_Phi","Jet2_Pt", "Jet2_Eta", "Jet2_Phi","Jet3_Pt", "Jet3_Eta", "Jet3_Phi","Jet4_Pt", "Jet4_Eta", "Jet4_Phi","NCleanedJets", "select", "LongZCorrectedRecoil_PerpZ", "recoilslimmedMETs_PerpZ", "recoilslimmedMETsPuppi_PerpZ",
-			"dmvamet_Pt","dmvamet_Phi", 
-                        "dpfmet_Pt","dpfmet_phi",
+			            "LongZCorrectedRecoil_MET","LongZCorrectedRecoil_METPhi",
+                        "dpfmet_Pt","dpfmet_Phi",
                         "mvaMetSumEt", "pfMetSumEt",
                         "recoMetPar","recoMetPerp","recoMetPhi",
                         "recoPfMetPar","recoPfMetPerp","recoPfMetPhi",
                         "recoMetOnGenMetProjectionPar","recoMetOnGenMetProjectionPerp","recoMetOnGenMetProjectionPhi",
-                        "recoPfMetOnGenMetProjectionPar","recoPfMetOnGenMetProjectionPerp","recoPfMetOnGenMetProjectionPhi",    
+                        "recoPfMetOnGenMetProjectionPar","recoPfMetOnGenMetProjectionPerp","recoPfMetOnGenMetProjectionPhi",
                         "genMetSumEt","genMet_Pt","genMet_Phi",
                         "npu"
 			],
@@ -52,7 +52,7 @@
 			"plotBDTPerformance": true,
 			"plotPuppiPerformance": false,
 			"plotPhiCorrected": false,
-			"plotAdditionalBDTPlots": false,
+			"plotAdditionalBDTPlots": true,
 			"plotAdditionalCustomPlots": true,
 			"plotJetStudyPlots": false,
 			"lowerAlphaCut": 0.2,

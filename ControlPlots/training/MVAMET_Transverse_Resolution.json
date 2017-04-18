@@ -1,0 +1,15 @@
+{
+    "y_expressions": [
+        "recoilslimmedMETs_PerpZ", 
+        "LongZCorrectedRecoil_PerpZ", 
+        "recoilslimmedMETsPuppi_PerpZ"
+    ], 
+    "y_label": "$U_{\\perp}/p_T^Z$", 
+    "y_bins": [
+        "50,-100,100"
+    ], 
+    "y_lims": [
+        0, 
+        30.0
+    ]
+}

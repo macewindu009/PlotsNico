@@ -67,11 +67,11 @@ def get_Quantity(data, dictPlot, quantity, method = 'Trunc'):
 		n, bins, patches = plt.hist(centralData, num_bins, facecolor='green', alpha=0.5)
 		XCenter = (bins[:-1] + bins[1:])/2
 		if method == 'Fit':
-		    p0 = [1., 0., 1.] 
+		    p0 = [1., 0., 1.]
 		    try:
 			coeff, var_matrix = curve_fit(gauss,XCenter,n,p0=p0)
 		    except:
-			coeff =[0,0,0] 
+			coeff =[0,0,0]
 		    if quantity == 'Mean':
 			return coeff[1]
 		    elif quantity == 'Std':
@@ -109,7 +109,7 @@ def getNextAlphaPoint(dictPlot, alphaData, currentPoint):
 		while alphaData[(alphaData[:,dictPlot['Jet1_Pt']]/alphaData[:,dictPlot['Boson_Pt']]>currentPoint) &(alphaData[:,dictPlot['Jet1_Pt']]/alphaData[:,dictPlot['Boson_Pt']]<(currentPoint+0.01*i))].shape[0] < deltaEntries and (currentPoint + 0.01*i)<= 1.:
 			i += 1
 		return currentPoint + i * 0.01
-	 
+
 
 def alphaFit(dictPlot, alphaDataIn, bosonName='recoilslimmedMETs_Pt', mode='Response', saveName = 'dummy.png', method = 'AlphaInclInt'):
 	XRange = np.zeros(9)
@@ -137,7 +137,7 @@ def alphaFit(dictPlot, alphaDataIn, bosonName='recoilslimmedMETs_Pt', mode='Resp
 		    #XRange[index] = (maxAlpha+minAlpha)/2
 		    XRange[index] = maxAlpha
 		    YMean[index] = get_Quantity(currentDistri, dictPlot, 'Mean', method = 'Trunc')
-		    YStd[index] = get_Quantity(currentDistri, dictPlot, 'Std', method = 'Trunc')					
+		    YStd[index] = get_Quantity(currentDistri, dictPlot, 'Std', method = 'Trunc')
 		    minAlpha = maxAlpha
 		    maxAlpha = getNextAlphaPoint(dictPlot, alphaData, minAlpha)
 	except:
@@ -184,9 +184,9 @@ def fwhm(x, y, method = 'Linear',k=10):
     """
 
 
-    
+
     half_max = np.max(y)/2.0
-    
+
     if method == 'Linear':
 	#version B / linear interpolation
 	roots = []
@@ -235,16 +235,46 @@ def doublegauss(x, *p):
     A1, A2, mu1, mu2, sigma1, sigma2 = p
     return A1*np.exp(-(x-mu1)**2/(2.*sigma1**2)) + A2*np.exp(-(x-mu2)**2/(2.*sigma2**2))
 
+def add_MetProjections(config, inputDataPlot, dictPlot):
+    variable = 'recoMetOnGenMetProjectionPar'
+    if 'LongZCorrectedRecoil_MET' in dictPlot and 'LongZCorrectedRecoil_METPhi' in dictPlot and 'genMet_Pt' in dictPlot and 'genMet_Phi' in dictPlot:
+    	if not 'recoMetOnGenMetProjectionPar' in dictPlot:
+            dictPlot['recoMetOnGenMetProjectionPar'] = inputDataPlot.shape[1]
+            inputDataPlot = np.hstack((inputDataPlot, np.array(np.cos(inputDataPlot[:,dictPlot['genMet_Phi']]-inputDataPlot[:,dictPlot['LongZCorrectedRecoil_METPhi']])*(inputDataPlot[:,dictPlot['LongZCorrectedRecoil_MET']])).reshape(inputDataPlot.shape[0],1)))
+    	if not 'recoMetOnGenMetProjectionPerp' in dictPlot:
+            dictPlot['recoMetOnGenMetProjectionPerp'] = inputDataPlot.shape[1]
+            inputDataPlot = np.hstack((inputDataPlot, np.array(np.sin(inputDataPlot[:,dictPlot['genMet_Phi']]-inputDataPlot[:,dictPlot['LongZCorrectedRecoil_METPhi']])*(inputDataPlot[:,dictPlot['LongZCorrectedRecoil_MET']])).reshape(inputDataPlot.shape[0],1)))
+
+
+    for index in range(len(config['inputFile'])-1):
+        if 'V%iLongZCorrectedRecoil_MET'%index in dictPlot and 'V%iLongZCorrectedRecoil_METPhi'%index in dictPlot and 'genMet_Pt' in dictPlot and 'genMet_Phi' in dictPlot:
+            if not 'V%irecoMetOnGenMetProjectionPar'%index in dictPlot:
+                dictPlot['V%irecoMetOnGenMetProjectionPar'%index] = inputDataPlot.shape[1]
+                inputDataPlot = np.hstack((inputDataPlot, np.array(np.cos(inputDataPlot[:,dictPlot['genMet_Phi']]-inputDataPlot[:,dictPlot['V%iLongZCorrectedRecoil_METPhi'%index]])*(inputDataPlot[:,dictPlot['V%iLongZCorrectedRecoil_MET'%index]])).reshape(inputDataPlot.shape[0],1)))
+            if not 'V%irecoMetOnGenMetProjectionPerp'%index in dictPlot:
+                dictPlot['V%irecoMetOnGenMetProjectionPerp'%index] = inputDataPlot.shape[1]
+                inputDataPlot = np.hstack((inputDataPlot, np.array(np.sin(inputDataPlot[:,dictPlot['genMet_Phi']]-inputDataPlot[:,dictPlot['V%iLongZCorrectedRecoil_METPhi'%index]])*(inputDataPlot[:,dictPlot['V%iLongZCorrectedRecoil_MET'%index]])).reshape(inputDataPlot.shape[0],1)))
+
+
+    if 'dpfmet_Pt' in dictPlot and 'dpfmet_Phi' in dictPlot and 'genMet_Pt' in dictPlot:
+    	if not 'recoPfMetOnGenMetProjectionPar' in dictPlot:
+	    dictPlot['recoPfMetOnGenMetProjectionPar'] = inputDataPlot.shape[1]
+            inputDataPlot = np.hstack((inputDataPlot, np.array(np.cos(inputDataPlot[:,dictPlot['dpfmet_Phi']])*(inputDataPlot[:,dictPlot['genMet_Pt']]-inputDataPlot[:,dictPlot['dpfmet_Pt']])).reshape(inputDataPlot.shape[0],1)))
+    	if not 'recoPfMetOnGenMetProjectionPerp' in dictPlot:
+	    dictPlot['recoPfMetOnGenMetProjectionPerp'] = inputDataPlot.shape[1]
+            inputDataPlot = np.hstack((inputDataPlot, np.array(np.sin(inputDataPlot[:,dictPlot['dpfmet_Phi']])*(inputDataPlot[:,dictPlot['genMet_Pt']]-inputDataPlot[:,dictPlot['dpfmet_Pt']])).reshape(inputDataPlot.shape[0],1)))
+
+    return inputDataPlot, dictPlot
 
 def load_datasetcsv(config):
     #create Treevariable
-    
+
     start = time.time()
-    
+
 
     ArtusDict = {
-            "mvamet" : "dmvamet_Pt",
-            "mvametphi" : "dmvamet_Phi",
+            "mvamet" : "MVAMET_Pt",
+            "mvametphi" : "MVAMET_Phi",
             "met" : "dpfmet_Pt",
             "metphi" : "dpfmet_Phi",
             "mvaMetSumEt" : "LongZCorrectedRecoil_sumEt",
@@ -266,10 +296,10 @@ def load_datasetcsv(config):
             "recoMetOnGenMetProjectionPhi" : "recoMetOnGenMetProjectionPhi",
             "recoPfMetOnGenMetProjectionPar" : "recoPfMetOnGenMetProjectionPar",
             "recoPfMetOnGenMetProjectionPerp" : "recoPfMetOnGenMetProjectionPerp",
-            "recoPfMetOnGenMetProjectionPhi" : "recoPfMetOnGenMetProjectionPhi",     
+            "recoPfMetOnGenMetProjectionPhi" : "recoPfMetOnGenMetProjectionPhi",
             "genMetSumEt" : "genMetSumEt",
             "genMetPt" : "genMet_Pt",
-            "genMetPhi" : "genMetPhi",
+            "genMetPhi" : "genMet_Phi",
             "npv" : "NVertex",
             "npu" : "npu",
             "njets" : "NCleanedJets",
@@ -277,7 +307,7 @@ def load_datasetcsv(config):
             "iso_2" : "iso_2",
             "ptvis" : "Boson_Pt"
             }
-            
+
 
 
     filename = config['inputFile'][0]
@@ -286,7 +316,7 @@ def load_datasetcsv(config):
     datacsv=list(reader)
     header = np.array(datacsv[0]).astype(np.str)
     inputdatentot =np.array(datacsv[1:]).astype(np.float32)
-    
+
     dictInputTot = {}
     for index in range(0,header.shape[0]):
         if header[index] in ArtusDict:
@@ -294,7 +324,7 @@ def load_datasetcsv(config):
         else:
             dictInputTot[header[index]] = index
             #print(header[index])
-    
+
     #for name in dictInputTot:
        	#print(name)
 
@@ -303,7 +333,7 @@ def load_datasetcsv(config):
 
 
     inputDataPlot = np.empty(shape=[inputdatentot.shape[0],0]).astype(np.float32)
-    
+
 
     dictPlot = {}
 
@@ -312,15 +342,15 @@ def load_datasetcsv(config):
 
     dt = int((time.time() - start))
     print('Elapsed time for loading dataset: ', dt)
-    lastTime = time.time() 
-    
+    lastTime = time.time()
+
     for index, entry in enumerate(dictInputTot):
 	if entry in plotnames:
 	    dictPlot[entry] = inputDataPlot.shape[1]
 	    inputDataPlot = np.hstack((inputDataPlot, np.array(inputdatentot[:,dictInputTot[entry]]).reshape(inputdatentot.shape[0],1)))
 
     if len(config['inputFile']) > 1:
-	trainingheader =  ["LongZCorrectedRecoil_LongZ","LongZCorrectedRecoil_PerpZ","LongZCorrectedRecoil_Phi","PhiCorrectedRecoil_LongZ","PhiCorrectedRecoil_PerpZ","PhiCorrectedRecoil_Phi"]
+	trainingheader =  ["LongZCorrectedRecoil_LongZ","LongZCorrectedRecoil_PerpZ","LongZCorrectedRecoil_Phi","PhiCorrectedRecoil_LongZ","PhiCorrectedRecoil_PerpZ","PhiCorrectedRecoil_Phi", "dmvamet_Pt", "dmvamet_Phi", "recoMetOnGenMetProjectionPar", "recoMetOnGenMetProjectionPerp","recoPfMetOnGenMetProjectionPar","recoPfMetOnGenMetProjectionPerp"]
 	for index in range(len(config['inputFile'])-1):
 	    filename = config['inputFile'][index+1]
 	    print('Loading dataset %s ...'%filename)
@@ -336,29 +366,34 @@ def load_datasetcsv(config):
 	    lastTime = time.time()
 	    print('Elapsed time for loading dataset: ', dt)
 
-    #print(dictPlot)
+
+    #add rojection on real Met for data from MapAnalyzer as it is not calculated there
+    inputDataPlot, dictPlot = add_MetProjections(config, inputDataPlot, dictPlot)
+
+
+    print(dictPlot)
     #print(inputDataPlot.shape)
 
 
-    
+
     dt = int((time.time() - start))
     print('Elapsed time for loading whole data: ', dt)
 
     return inputDataPlot, dictPlot
-    
-    
-    
+
+
+
 def make_Plot(variablename, inputData, dictPlot, outputdir):
 
     histData = inputData[:,dictPlot[variablename]]
-    
+
     if not os.path.exists(outputdir):
 	os.makedirs(outputdir)
-	
-    
-    
+
+
+
     num_bins = 100
-    
+
     if variablename == 'targetRecoilFromBDT' or variablename == 'targetRecoilFromSlimmed':
 	n, bins, patches = plt.hist(histData, num_bins, facecolor='green', alpha=0.5, range=[-50, 50])
     else:
@@ -366,12 +401,12 @@ def make_Plot(variablename, inputData, dictPlot, outputdir):
     plt.xlabel(variablename,fontsize = 17)
     plt.ylabel('Hits',fontsize = 17)
 
-	
+
     plt.savefig((outputdir+variablename+".png"))
     plt.clf()
     return 0
-    
-    
+
+
 def make_ResponseCorrectedPlot(config, XRange, YStd, YResponse, bosonName, targetvariable,  minrange,maxrange, stepwidth, ptmin,ptmax, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
 
     plt.clf()
@@ -386,12 +421,12 @@ def make_ResponseCorrectedPlot(config, XRange, YStd, YResponse, bosonName, targe
     plt.figure(6)
     plt.plot(XRange[:-1]+stepwidth/2.,ResCorr,'o-',label=labelname)
     plt.figure(0)
-    plt.clf()    
-    
-    
-    
-    return 
-    
+    plt.clf()
+
+
+
+    return
+
 def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
 
 
@@ -405,9 +440,9 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable,  mi
     XRange = np.arange(minrange,maxrange,stepwidth)
     YMean = np.zeros((XRange.shape[0]-1,1))
     YStd = np.zeros((XRange.shape[0]-1,1))
-    
+
     print('Resolution %s versus %s'%(bosonName,targetvariable))
-    #YValues 
+    #YValues
     for index in range(0,XRange.shape[0]-1):
 
 	AlternativeDistri = plotData[(XRange[index]<plotData[:,dictPlot[targetvariable]]) & (XRange[index+1]>plotData[:,dictPlot[targetvariable]])]
@@ -419,29 +454,29 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable,  mi
 	    YStd[index] = 0
 	else:
 	    num_bins = 100
-	    
+
 	    #YMean[index] = currentDistri.mean()
             #YStd[index] = currentDistri.std()
             #print("Left %i outlier events out for fitting"%(currentDistri.shape[0]-fitDistri.shape[0]))
-            
+
             n, bins, patches = plt.hist(fitDistri, num_bins, facecolor='green', alpha=0.5)
-            
+
             XCenter = (bins[:-1] + bins[1:])/2
             p0 = [1., 0., 1.]
 	    try:
 	            coeff, var_matrix = curve_fit(gauss,XCenter,n,p0=p0)
             except:
 		    coeff = p0
-		    
+
             chiNormal = ((gauss(XCenter,*coeff)-n)**2/n).sum()
             chiperDOF = chiNormal/(num_bins-3)
-                
-	    FWHM_mean, FWHM_std = fwhm(XCenter,n)    
+
+	    FWHM_mean, FWHM_std = fwhm(XCenter,n)
             """
             coeffDouble, var_matrixDouble = curve_fit(doublegauss,XCenter,n,p0=p0)
-            
+
             plt.text(meanLoc-2.5*stdLoc,0.4*(plt.ylim()[1]-plt.ylim()[0]),r'$\mu_{2Gauss}^1 = %.2f$''\n'r'$=\sigma_{2Gauss}^1= %.2f$''\n'r'$\mu_{2Gauss}^2 = %.2f$''\n'r'$=\sigma_{2Gauss}^2= %.2f$''\n'%(coeffDouble[1], coeffDouble[2], coeffDouble[4, coeffDouble[5]]),color = 'k',fontsize=16)
-            
+
             print(coeffDouble)
             """
             if bosonName[0] == 'V':
@@ -465,11 +500,11 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable,  mi
                     YStd[index] = get_Quantity(currentDistri, dictPlot, 'Std', config['method'][0])
             meanLoc = coeff[1]
             stdLoc = abs(coeff[2])
-	
+
 	    alpha_mean, alpha_std = alphaFit(dictPlot, AlternativeDistri, bosonName,'Resolution')
 
             plt.clf()
-                
+
             #y = mlab.normpdf(bins, currentDistri.mean(), currentDistri.std())
             plt.rc('font', family='serif')
             n, bins, patches = plt.hist(currentDistri, num_bins, normed=1, range=[fitDistri.mean()-3*fitDistri.std(), fitDistri.mean()+5*fitDistri.std()], facecolor='green', alpha=0.5)
@@ -478,10 +513,10 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable,  mi
             plt.xlabel(r'$U_\| - p_t^Z$ at $%s = (%i - %i)\,\mathrm{%s}$'%(relateVar,XRange[index],XRange[index+1],relateUnits),fontsize = 17)
 	    plt.text(meanLoc+1.8*stdLoc,0.15*(plt.ylim()[1]-plt.ylim()[0]),r'$\mathrm{Events} = %i$''\n'r'$\mathrm{Outliers}(>4\sigma) = %.2f$%%''\n'r'$\mu_{tot} = %.3f$''\n'r'$\sigma_{tot} = %.3f$''\n'r'$\mu_{sel} = %.3f (\Delta_{tot} = %.2f\sigma_{tot}$)''\n'r'$\sigma_{sel} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\mu_{fit} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\sigma_{fit} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\chi_{pDoF}^2 = %.1f$''\n'r'$\mu_{FWHM} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\sigma_{FWHM} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\mu_{\alpha} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\sigma_{\alpha} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)'%(currentDistri.shape[0],100*(1-fitDistri.shape[0]*1./currentDistri.shape[0]),currentDistri.mean(),currentDistri.std(),fitDistri.mean(),(fitDistri.mean()-currentDistri.mean())/currentDistri.std(), fitDistri.std(),(fitDistri.std()-currentDistri.std())/currentDistri.std(), meanLoc,(meanLoc-currentDistri.mean())/currentDistri.std(),stdLoc,(stdLoc-currentDistri.std())/currentDistri.std(),chiperDOF,FWHM_mean,(FWHM_mean-currentDistri.mean())/currentDistri.std(),FWHM_std/2.355,(FWHM_std/2.355-currentDistri.std())/currentDistri.std(),alpha_mean,(alpha_mean-currentDistri.mean())/currentDistri.std(),alpha_std,(alpha_std-currentDistri.std())/currentDistri.std()),color = 'k',fontsize=16)
             #plt.title('DMean: %f , DStd: %f'%(currentDistri.mean()-coeff[1],currentDistri.std()-coeff[2]), fontsize = 20)
-            
+
             #plt.ylabel('(MET Boson PT_Long)/(True Boson Pt)',fontsize = 17)
             plt.ylabel('frequency distribution',fontsize = 17)
-        
+
             if ptmax == 0:
                 plt.title('Resolution %s'%labelname, fontsize = 20)
                 plt.plot(bins, y, 'r--')
@@ -490,7 +525,7 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable,  mi
                     os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
 		    bashCommand = 'cp index.php %sControlPlots/SingleDistributions/%s/'%(config['outputDir'],foldername)
 		    os.system(bashCommand)
-                plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
+                plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))
 		if config['method'][0][0:5] == 'Alpha':
 		    alphaFit(dictPlot, AlternativeDistri, bosonName,'Resolution', (config['outputDir'] + 'ControlPlots/SingleDistributions/%s/alpha_%s_%i.png' %(foldername,foldername, index)), method = config['method'][0])
 		else:
@@ -504,13 +539,13 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable,  mi
                     os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
 		    bashCommand = 'cp index.php %sControlPlots/SingleDistributions/%s/'%(config['outputDir'],Bashfoldername)
 		    os.system(bashCommand)
-                plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
+                plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))
 		if config['method'][0][0:5] == 'Alpha':
 		    alphaFit(dictPlot, AlternativeDistri, bosonName,'Resolution', (config['outputDir'] + 'ControlPlots/SingleDistributions/%s/alpha_%s_%i.png' %(foldername,foldername, index)), method = config['method'][0])
 		else:
 		    alphaFit(dictPlot, AlternativeDistri, bosonName,'Resolution', (config['outputDir'] + 'ControlPlots/SingleDistributions/%s/alpha_%s_%i.png' %(foldername,foldername, index)))
-                
-                
+
+
     plt.clf()
     plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o-')
     plt.ylabel('(MET Boson PT_Long) - (True Boson Pt)',fontsize = 17)
@@ -523,12 +558,12 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable,  mi
     plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o-',label=labelname)
     plt.figure(0)
     plt.clf()
-    
-    
-    
+
+
+
     return XRange, YStd
 
-   
+
 def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
 
 
@@ -542,9 +577,9 @@ def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, 
     XRange = np.arange(minrange,maxrange,stepwidth)
     YMean = np.zeros((XRange.shape[0]-1,1))
     YStd = np.zeros((XRange.shape[0]-1,1))
-    
+
     print('MET Resolution %s versus %s'%(bosonName,targetvariable))
-    #YValues 
+    #YValues
     for index in range(0,XRange.shape[0]-1):
 
 	AlternativeDistri = plotData[(XRange[index]<plotData[:,dictPlot[targetvariable]]) & (XRange[index+1]>plotData[:,dictPlot[targetvariable]])]
@@ -574,7 +609,7 @@ def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, 
 		YStd[index] = get_Quantity(currentDistri, dictPlot, 'Std', config['method'][0])
 
 
-    
+
 	if index < 12:
 	    plt.clf()
 	    num_bins = 50
@@ -589,16 +624,16 @@ def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, 
 		    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
 		    bashCommand = 'cp index.php %sControlPlots/SingleDistributions/%s/'%(config['outputDir'],foldername)
 		    os.system(bashCommand)
-		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
+		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))
 	    else:
 		foldername = 'METResolution(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
-		Bashfoldername = 'METResolution(\%i\<Pt\<%i\)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
+		Bashfoldername = 'METResolution\(%i\<Pt\<%i\)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
 		if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
 		    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
 		    bashCommand = 'cp index.php %sControlPlots/SingleDistributions/%s/'%(config['outputDir'],Bashfoldername)
 		    os.system(bashCommand)
-		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
-                        
+		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))
+
     plt.clf()
     plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o')
     plt.ylabel('(MET) - (gen MET)',fontsize = 17)
@@ -611,14 +646,14 @@ def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, 
     plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o-',label=labelname)
     plt.figure(0)
     plt.clf()
-    
-    
+
+
     return 0
-    
+
 
 
 def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
-  
+
     #XRange = np.arange(plotData[:,targetindex].min(),plotData[:,targetindex].max(),(plotData[:,targetindex].max()-plotData[:,targetindex].min())/nbins)
     if minrange == 42:
 	minrange = plotData[:,dictPlot[targetvariable]].min()
@@ -626,16 +661,16 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  min
 	maxrange = plotData[:,dictPlot[targetvariable]].max()
     if stepwidth == 0:
 	stepwidth = (maxrange-minrange)/20
-	
+
     XRange = np.arange(minrange,maxrange,stepwidth)
 
     YMean = np.zeros((XRange.shape[0]-1,1))
     YStd = np.zeros((XRange.shape[0]-1,1))
     print('Response %s versus %s'%(bosonName,targetvariable))
-    
-    
-    
-    #YValues 
+
+
+
+    #YValues
     ignoredEntries = 0
     for index in range(0,XRange.shape[0]-1):
 
@@ -644,8 +679,8 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  min
 	currentDistri = -AlternativeDistri[:,dictPlot[bosonName]]/AlternativeDistri[:,dictPlot['Boson_Pt']]
 	#YMean[index] = currentDistri.mean()
 	#YStd[index] = currentDistri.std()
-	
-    
+
+
         #YMean[index] = currentDistri.mean()
         #YStd[index] = currentDistri.std()
         fitDistri = currentDistri[((currentDistri.mean()-4*currentDistri.std())<currentDistri[:]) & (currentDistri[:] <(currentDistri.mean()+4*currentDistri.std()))]
@@ -656,7 +691,7 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  min
 	else:
 	    num_bins = 50
 	    n, bins, patches = plt.hist(fitDistri, num_bins, facecolor='green', alpha=0.5)
-	    
+
 	    XCenter = (bins[:-1] + bins[1:])/2
 	    p0 = [1., 0., 1.]
 	    try:
@@ -665,7 +700,7 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  min
 		    coeff = p0
 	    p0Double = [1., 1., 1., 0., 1., 1.]
 	    #coeffDouble, var_matrixDouble = curve_fit(doublegauss,XCenter,n,p0=p0Double)
-	    
+
 	    #print(gauss(XCenter,*coeff)-n)
 	    chiNormal = ((gauss(XCenter,*coeff)-n)**2/n).sum()
 	    chiperDOF = chiNormal/(num_bins-3)
@@ -673,10 +708,10 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  min
 
 	    #print("Normal Gauss: %f"%chiNormal)
 	    #print("Normal Gauss: %f"%chiDouble)
-	    
-	    
+
+
 	    #print(coeffDouble)
-	    
+
 
             if bosonName[0] == 'V':
                 if len(config['method']) > 1:
@@ -700,9 +735,9 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  min
 
 	    meanLoc = coeff[1]
 	    stdLoc = abs(coeff[2])
-	    
+
 	    FWHM_mean, FWHM_std = fwhm(XCenter,n)
-	    
+
 	    #YMean[index] = currentDistri.mean()
 	    #YStd[index] = currentDistri.std()
 	    plt.clf()
@@ -714,8 +749,8 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  min
 	    #y = mlab.normpdf(bins, meanLoc, stdLoc)
 	    #print("y ",y.shape)
 	    y = gauss(bins,*coeff)
-	    
-	    
+
+
 	    #plt.xlabel('%s at %f, mean: %f'%(targetvariable,(XRange[index+1]+XRange[index])/2,currentDistri.mean()),fontsize = 17)
 	    plt.xlabel(r'$U_\| / p_t^Z$ at $%s = (%i - %i)\,\mathrm{%s}$'%(relateVar,XRange[index],XRange[index+1],relateUnits),fontsize = 17)
 	    plt.text(meanLoc+1.8*stdLoc,0.15*(plt.ylim()[1]-plt.ylim()[0]),r'$\mathrm{Events} = %i$''\n'r'$\mathrm{Outliers}(>4\sigma) = %.2f$%%''\n'r'$\mu_{tot} = %.3f$''\n'r'$\sigma_{tot} = %.3f$''\n'r'$\mu_{sel} = %.3f (\Delta_{tot} = %.2f\sigma_{tot}$)''\n'r'$\sigma_{sel} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\mu_{fit} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\sigma_{fit} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\chi_{pDoF}^2 = %.1f$''\n'r'$\mu_{FWHM} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\sigma_{FWHM} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\mu_{\alpha} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)''\n'r'$\sigma_{\alpha} = %.3f (\Delta_{tot} = %.2f \sigma_{tot}$)'%(currentDistri.shape[0],100*(1-fitDistri.shape[0]*1./currentDistri.shape[0]),currentDistri.mean(),currentDistri.std(),fitDistri.mean(),(fitDistri.mean()-currentDistri.mean())/currentDistri.std(), fitDistri.std(),(fitDistri.std()-currentDistri.std())/currentDistri.std(), meanLoc,(meanLoc-currentDistri.mean())/currentDistri.std(),stdLoc,(stdLoc-currentDistri.std())/currentDistri.std(),chiperDOF,FWHM_mean,(FWHM_mean-currentDistri.mean())/currentDistri.std(),FWHM_std/2.355,(FWHM_std/2.355-currentDistri.std())/currentDistri.std(),alpha_mean,(alpha_mean-currentDistri.mean())/currentDistri.std(),alpha_std,(alpha_std-currentDistri.std())/currentDistri.std()),color = 'k',fontsize=16)
@@ -723,7 +758,7 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  min
 
 	    #plt.ylabel('(MET Boson PT_Long)/(True Boson Pt)',fontsize = 17)
 	    plt.ylabel('frequency distribution',fontsize = 17)
-	    
+
 	    if ptmax == 0:
 		plt.title('Response %s'%labelname, fontsize = 20)
 		plt.plot(bins, y, 'r--')
@@ -732,7 +767,7 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  min
 		    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
 		    bashCommand = 'cp index.php %sControlPlots/SingleDistributions/%s/'%(config['outputDir'],foldername)
 		    os.system(bashCommand)
-		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
+		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))
 		if config['method'][0][0:5] == 'Alpha':
 		    alphaFit(dictPlot, AlternativeDistri, bosonName,'Response', (config['outputDir'] + 'ControlPlots/SingleDistributions/%s/alpha_%s_%i.png' %(foldername,foldername, index)), method = config['method'][0])
 		else:
@@ -746,7 +781,7 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  min
 		    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
 		    bashCommand = 'cp index.php %sControlPlots/SingleDistributions/%s/'%(config['outputDir'],Bashfoldername)
 		    os.system(bashCommand)
-		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))   
+		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))
 		if config['method'][0][0:5] == 'Alpha':
 		    alphaFit(dictPlot, AlternativeDistri, bosonName,'Response', (config['outputDir'] + 'ControlPlots/SingleDistributions/%s/alpha_%s_%i.png' %(foldername,foldername, index)), method = config['method'][0])
 		else:
@@ -762,15 +797,15 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  min
     plt.clf()
     plt.figure(4)
     plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o-',label=labelname)
-    
+
     plt.figure(0)
-    
+
 
     return YMean
 
-    
+
 def make_METResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
-  
+
     #XRange = np.arange(plotData[:,targetindex].min(),plotData[:,targetindex].max(),(plotData[:,targetindex].max()-plotData[:,targetindex].min())/nbins)
     if minrange == 42:
 	minrange = plotData[:,dictPlot[targetvariable]].min()
@@ -778,13 +813,13 @@ def make_METResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  
 	maxrange = plotData[:,dictPlot[targetvariable]].max()
     if stepwidth == 0:
 	stepwidth = (maxrange-minrange)/20
-	
+
     XRange = np.arange(minrange,maxrange,stepwidth)
     YMean = np.zeros((XRange.shape[0]-1,1))
     YStd = np.zeros((XRange.shape[0]-1,1))
     print('MET Response %s versus %s'%(bosonName,targetvariable))
-    
-    #YValues 
+
+    #YValues
     ignoredEntries = 0
     for index in range(0,XRange.shape[0]-1):
 
@@ -829,7 +864,7 @@ def make_METResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  
 		    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
 		    bashCommand = 'cp index.php %sControlPlots/SingleDistributions/%s/'%(config['outputDir'],foldername)
 		    os.system(bashCommand)
-		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))        
+		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))
 	    else:
 		foldername = 'METResponse(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
 		Bashfoldername = 'METResponse\(%i\<Pt\<%i\)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
@@ -837,7 +872,7 @@ def make_METResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  
 		    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
 		    bashCommand = 'cp index.php %sControlPlots/SingleDistributions/%s/'%(config['outputDir'],Bashfoldername)
 		    os.system(bashCommand)
-		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))                    
+		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))
 
     plt.clf()
     plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o')
@@ -850,14 +885,14 @@ def make_METResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  
     plt.clf()
     plt.figure(9)
     plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o-',label=labelname)
-    
+
     plt.figure(0)
-    
+
 
     return 0
 
-    
-    
+
+
 def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
 
 
@@ -871,15 +906,15 @@ def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable,
     XRange = np.arange(minrange,maxrange,stepwidth)
     YMean = np.zeros((XRange.shape[0]-1,1))
     YStd = np.zeros((XRange.shape[0]-1,1))
-    
+
     print('Resolution Perp %s versus %s'%(bosonName,targetvariable))
-    #YValues 
+    #YValues
     for index in range(0,XRange.shape[0]-1):
 
 	AlternativeDistri = plotData[(XRange[index]<plotData[:,dictPlot[targetvariable]]) & (XRange[index+1]>plotData[:,dictPlot[targetvariable]])]
 	currentDistri = AlternativeDistri[:,dictPlot[bosonName]]
 
-    
+
 	if bosonName[0] == 'V':
             if len(config['method']) > 1:
                 if config['method'][int(bosonName[1])+1][0:5] == 'Alpha':
@@ -917,7 +952,7 @@ def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable,
 		    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
 		    bashCommand = 'cp index.php %sControlPlots/SingleDistributions/%s/'%(config['outputDir'],foldername)
 		    os.system(bashCommand)
-		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))    
+		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))
 	    else:
 		foldername = 'ResolutionPerp(%i<Pt<%i)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
 		Bashfoldername = 'ResolutionPerp\(%i\<Pt\<%i\)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
@@ -925,8 +960,8 @@ def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable,
 		    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
 		    bashCommand = 'cp index.php %sControlPlots/SingleDistributions/%s/'%(config['outputDir'],Bashfoldername)
 		    os.system(bashCommand)
-		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))    
-		    
+		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))
+
     plt.clf()
     plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o')
     plt.ylabel('MET Boson PT_Perp',fontsize = 17)
@@ -940,12 +975,12 @@ def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable,
     plt.plot(XRange[:-1]+stepwidth/2.,YStd[:],'o-',label=labelname)
     plt.figure(0)
     plt.clf()
-    
 
-    return 
-    
+
+    return
+
 def make_ResponsePerpPlot(config, plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
-  
+
     #XRange = np.arange(plotData[:,targetindex].min(),plotData[:,targetindex].max(),(plotData[:,targetindex].max()-plotData[:,targetindex].min())/nbins)
     if minrange == 42:
 	minrange = plotData[:,dictPlot[targetvariable]].min()
@@ -953,14 +988,14 @@ def make_ResponsePerpPlot(config, plotData,dictPlot, bosonName, targetvariable, 
 	maxrange = plotData[:,dictPlot[targetvariable]].max()
     if stepwidth == 0:
 	stepwidth = (maxrange-minrange)/20
-	
+
     XRange = np.arange(minrange,maxrange,stepwidth)
     YMean = np.zeros((XRange.shape[0]-1,1))
     YStd = np.zeros((XRange.shape[0]-1,1))
     print('Response Perp %s versus %s'%(bosonName,targetvariable))
-    
-    
-    #YValues 
+
+
+    #YValues
     ignoredEntries = 0
     for index in range(0,XRange.shape[0]-1):
 
@@ -1011,7 +1046,7 @@ def make_ResponsePerpPlot(config, plotData,dictPlot, bosonName, targetvariable, 
 		Bashfoldername = 'ResponsePerp\(%i\<Pt\<%i\)_%s_vs_%s' %(ptmin,ptmax,bosonName,targetvariable)
 		if not os.path.exists(config['outputDir'] + 'ControlPlots/SingleDistributions/%s/'%foldername):
 		    os.makedirs(config['outputDir'] + 'ControlPlots/SingleDistributions/%s'%foldername)
-		    bashCommand = 'cp index.php %sControlPlots/SingleDistributions/%s/'%(config['outputDir'],Bashfoldername) 
+		    bashCommand = 'cp index.php %sControlPlots/SingleDistributions/%s/'%(config['outputDir'],Bashfoldername)
 		    os.system(bashCommand)
 		plt.savefig((config['outputDir'] + 'ControlPlots/SingleDistributions/%s/%s_%i.png' %(foldername,foldername, index)))
     plt.clf()
@@ -1026,12 +1061,12 @@ def make_ResponsePerpPlot(config, plotData,dictPlot, bosonName, targetvariable, 
     plt.figure(7)
     plt.plot(XRange[:-1]+stepwidth/2.,YMean[:],'o-',label=labelname)
     plt.figure(0)
-    
 
-    
-    return 
 
-    
+
+    return
+
+
 
 def make_ControlPlots(config, plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin=0,ptmax=0, labelname = 'MVAMet', relateVar = 'p_t^Z', relateUnits = 'GeV'):
 
@@ -1040,23 +1075,27 @@ def make_ControlPlots(config, plotData,dictPlot, bosonName, targetvariable,  min
     maxrange += stepwidth
     if not os.path.exists((config['outputDir'] + 'ControlPlots/SingleDistributions/')):
 	os.makedirs((config['outputDir'] + 'ControlPlots/SingleDistributions/'))
-    XRange, YVariance = make_ResolutionPlot(config, plotData, dictPlot, bosonNameLong, targetvariable,  minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits) 
+    XRange, YVariance = make_ResolutionPlot(config, plotData, dictPlot, bosonNameLong, targetvariable,  minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
     YResponse = make_ResponsePlot(config, plotData, dictPlot, bosonNameLong, targetvariable,  minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
     make_ResponseCorrectedPlot(config, XRange, YVariance, YResponse, bosonNameLong, targetvariable,  minrange,maxrange, stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
-    make_ResolutionPerpPlot(config, plotData, dictPlot, bosonNamePerp, targetvariable,  minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits) 
+    make_ResolutionPerpPlot(config, plotData, dictPlot, bosonNamePerp, targetvariable,  minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
     make_ResponsePerpPlot(config, plotData, dictPlot, bosonNamePerp, targetvariable,  minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
-    
-    if bosonName == "LongZCorrectedRecoil" and "recoMetOnGenMetProjectionPar" in dictPlot and not plotData[dictPlot["recoMetOnGenMetProjectionPar"]].mean() == -999:
+
+    if bosonName == "LongZCorrectedRecoil" and "recoMetOnGenMetProjectionPar" in dictPlot and not plotData[:,dictPlot["recoMetOnGenMetProjectionPar"]].mean() == -999:
         make_METResponsePlot(config, plotData, dictPlot, "recoMetOnGenMetProjectionPar", targetvariable,  minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
-        make_METResolutionPlot(config, plotData, dictPlot, "recoMetOnGenMetProjectionPar", targetvariable,  minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits) 
-    
-    if bosonName == "recoilslimmedMETs" and "recoPfMetOnGenMetProjectionPar" in dictPlot and not plotData[dictPlot["recoPfMetOnGenMetProjectionPar"]].mean() == -999:
+        make_METResolutionPlot(config, plotData, dictPlot, "recoMetOnGenMetProjectionPar", targetvariable,  minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
+
+    if bosonName[0] == "V" and "V%srecoMetOnGenMetProjectionPar"%bosonName[1] in dictPlot and not plotData[:,dictPlot["V%srecoMetOnGenMetProjectionPar"%bosonName[1]]].mean() == -999:
+        make_METResponsePlot(config, plotData, dictPlot, "V%srecoMetOnGenMetProjectionPar"%bosonName[1], targetvariable,  minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
+        make_METResolutionPlot(config, plotData, dictPlot, "V%srecoMetOnGenMetProjectionPar"%bosonName[1], targetvariable,  minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
+
+    if bosonName == "recoilslimmedMETs" and "recoPfMetOnGenMetProjectionPar" in dictPlot and not plotData[:,dictPlot["recoPfMetOnGenMetProjectionPar"]].mean() == -999:
         make_METResponsePlot(config, plotData, dictPlot, "recoPfMetOnGenMetProjectionPar", targetvariable,  minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
-        make_METResolutionPlot(config, plotData, dictPlot, "recoPfMetOnGenMetProjectionPar", targetvariable,  minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits) 
-    
-    
-    
-    return 
+        make_METResolutionPlot(config, plotData, dictPlot, "recoPfMetOnGenMetProjectionPar", targetvariable,  minrange,maxrange,stepwidth, ptmin, ptmax, labelname, relateVar, relateUnits)
+
+
+
+    return
 
 def make_JetStudyPlots(config, plotData, dictPlot):
     originalOutputDir = config['outputDir']
@@ -1078,7 +1117,7 @@ def make_JetStudyPlots(config, plotData, dictPlot):
 		XRange, YVariance = make_ResolutionPlot(config, lowerData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PFMet','p_t^Z','GeV')
 
     if 'recoilslimmedMETs_LongZ' in dictPlot:
-		bosonNameLong = 'recoilslimmedMETs_LongZ' 
+		bosonNameLong = 'recoilslimmedMETs_LongZ'
 		bosonNamePerp = 'recoilslimmedMETs_PerpZ'
     		if not os.path.exists((config['outputDir'] + 'ControlPlots/SingleDistributions/')):
         		os.makedirs((config['outputDir'] + 'ControlPlots/SingleDistributions/'))
@@ -1101,7 +1140,7 @@ def make_JetStudyPlots(config, plotData, dictPlot):
 		XRange, YVariance = make_ResolutionPlot(config, upperData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PFMet','p_t^Z','GeV')
 
     if 'recoilslimmedMETs_LongZ' in dictPlot:
-		bosonNameLong = 'recoilslimmedMETs_LongZ' 
+		bosonNameLong = 'recoilslimmedMETs_LongZ'
 		bosonNamePerp = 'recoilslimmedMETs_PerpZ'
     		if not os.path.exists((config['outputDir'] + 'ControlPlots/SingleDistributions/')):
         		os.makedirs((config['outputDir'] + 'ControlPlots/SingleDistributions/'))
@@ -1109,7 +1148,7 @@ def make_JetStudyPlots(config, plotData, dictPlot):
 		XRange, YVariance = make_ResolutionPlot(config, upperData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PFMet','p_t^Z','GeV')
 
 def make_MoreBDTPlots(config, plotData, dictPlot):
-   
+
     num_bins = 50
 
     if not os.path.exists((config['outputDir'] + 'CustomPlots/')):
@@ -1117,150 +1156,170 @@ def make_MoreBDTPlots(config, plotData, dictPlot):
 
 
     if 'recoilslimmedMETs_Phi' in dictPlot and 'Boson_Phi' in dictPlot and 'PhiCorrectedRecoil_Phi' in dictPlot:
-	DPhiPFBoson = plotData[:,dictPlot["Boson_Phi"]]-plotData[:,dictPlot["recoilslimmedMETs_Phi"]]+np.pi - 2.*np.pi*((plotData[:,dictPlot["Boson_Phi"]]-plotData[:,dictPlot["recoilslimmedMETs_Phi"]])>0)
-	DPhiMVABoson = plotData[:,dictPlot["Boson_Phi"]]-plotData[:,dictPlot["PhiCorrectedRecoil_Phi"]]+np.pi - 2.*np.pi*((plotData[:,dictPlot["Boson_Phi"]]-plotData[:,dictPlot["PhiCorrectedRecoil_Phi"]])>0)
- 
-	plt.clf()
-	n, bins, patches = plt.hist(DPhiPFBoson, num_bins, facecolor='green', label=(r'$\Delta(\phi_{PF},\phi_{Z})$'))
-	plt.legend(loc='best', numpoints=1)
+        DPhiPFBoson = plotData[:,dictPlot["Boson_Phi"]]-plotData[:,dictPlot["recoilslimmedMETs_Phi"]]+np.pi - 2.*np.pi*((plotData[:,dictPlot["Boson_Phi"]]-plotData[:,dictPlot["recoilslimmedMETs_Phi"]])>0)
+        DPhiMVABoson = plotData[:,dictPlot["Boson_Phi"]]-plotData[:,dictPlot["PhiCorrectedRecoil_Phi"]]+np.pi - 2.*np.pi*((plotData[:,dictPlot["Boson_Phi"]]-plotData[:,dictPlot["PhiCorrectedRecoil_Phi"]])>0)
+
+        plt.clf()
+        n, bins, patches = plt.hist(DPhiPFBoson, num_bins, facecolor='green', label=(r'$\Delta(\phi_{PF},\phi_{Z})$'))
+        plt.legend(loc='best', numpoints=1)
     	plt.xlabel(r'$\phi$',fontsize = 17)
     	plt.ylabel('Frequency distribution',fontsize = 17)
-	plt.savefig(config['outputDir'] + "/CustomPlots/DPhiPFBoson.png")
+        plt.savefig(config['outputDir'] + "/CustomPlots/DPhiPFBoson.png")
 
-	plt.clf()
-	n, bins, patches = plt.hist(DPhiMVABoson, num_bins, facecolor='green', label=(r'$\Delta(\phi_{MVA},\phi_{Z})$'))
+        plt.clf()
+        n, bins, patches = plt.hist(DPhiMVABoson, num_bins, facecolor='green', label=(r'$\Delta(\phi_{MVA},\phi_{Z})$'))
 
-	plt.legend(loc='best', numpoints=1)
+        plt.legend(loc='best', numpoints=1)
     	plt.xlabel(r'$\phi$',fontsize = 17)
     	plt.ylabel('Frequency distribution',fontsize = 17)
-	plt.savefig(config['outputDir'] + "/CustomPlots/DPhiMVABoson.png")
-    
-	plt.clf()
+        plt.savefig(config['outputDir'] + "/CustomPlots/DPhiMVABoson.png")
 
-	n, bins, patches = plt.hist([DPhiMVABoson,DPhiPFBoson], num_bins, label=[r'$\Delta(\phi_{MVA},\phi_{Z})$',r'$\Delta(\phi_{PF},\phi_{Z})$'])
+        plt.clf()
 
-	plt.legend(loc='best', numpoints=1)
-    	plt.xlabel(r'$\phi$',fontsize = 17)
-    	plt.ylabel('Frequency distribution',fontsize = 17)
-	plt.savefig(config['outputDir'] + "/CustomPlots/DPhiBothBoson.png")
-    
-	plt.clf()
+        n, bins, patches = plt.hist([DPhiMVABoson,DPhiPFBoson], num_bins, label=[r'$\Delta(\phi_{MVA},\phi_{Z})$',r'$\Delta(\phi_{PF},\phi_{Z})$'])
+
+        plt.legend(loc='best', numpoints=1)
+        plt.xlabel(r'$\phi$',fontsize = 17)
+        plt.ylabel('Frequency distribution',fontsize = 17)
+        plt.savefig(config['outputDir'] + "/CustomPlots/DPhiBothBoson.png")
+
+        plt.clf()
+
+
+    if 'PhiCorrectedRecoil_LongZ' in dictPlot and 'Boson_Pt' in dictPlot:
+        lowerPtCut = 150
+        upperPtCut = 160
+
+        plotDataCut = plotData[(lowerPtCut<plotData[:,dictPlot['Boson_Pt']]) & (upperPtCut>plotData[:,dictPlot['Boson_Pt']])]
+        BosonPtDistri = plotDataCut[:,dictPlot["Boson_Pt"]]
+        PhiPtDistri = -plotDataCut[:,dictPlot["PhiCorrectedRecoil_LongZ"]]
+        TargetDistri = BosonPtDistri/PhiPtDistri
+
+        plt.clf()
+        n, bins, patches = plt.hist(BosonPtDistri, num_bins, facecolor='green', label=(r'$p_t^Z$'))
+        plt.legend(loc='best', numpoints=1)
+        plt.xlabel(r'$p_t$ in GeV',fontsize = 17)
+        plt.ylabel('Frequency distribution',fontsize = 17)
+        plt.savefig(config['outputDir'] + "/CustomPlots/BosonPt_%i_to_%i.png"%(lowerPtCut,upperPtCut))
+
+        plt.clf()
+        n, bins, patches = plt.hist(PhiPtDistri, num_bins, facecolor='green', label=(r'$\mathrm{MVAMet}_{\Phi}$'), range=[lowerPtCut-45,upperPtCut+45])
+        plt.legend(loc='best', numpoints=1)
+        plt.xlabel(r'$p_t$ in GeV',fontsize = 17)
+        plt.ylabel('Frequency distribution',fontsize = 17)
+        plt.savefig(config['outputDir'] + "/CustomPlots/PhiCorrectedPt_%i_to_%i.png"%(lowerPtCut,upperPtCut))
+
+        plt.clf()
+        n, bins, patches = plt.hist([BosonPtDistri,PhiPtDistri], num_bins, label=[r'$p_t^Z$',r'$\mathrm{MVAMet}_{\Phi}$'], range=[lowerPtCut-45,upperPtCut+45])
+
+        plt.legend(loc='best', numpoints=1)
+        plt.xlabel(r'$p_t$ in GeV',fontsize = 17)
+        plt.ylabel('Frequency distribution',fontsize = 17)
+        plt.savefig(config['outputDir'] + "/CustomPlots/BosonAndPhiPt_%i_to%i.png"%(lowerPtCut,upperPtCut))
+
+        plt.clf()
+        n, bins, patches = plt.hist(TargetDistri, num_bins, facecolor='green', label=(r'Target = $p_t^Z$ / $\mathrm{MVAMet}_{\Phi}$'), range=[0.5,2])
+        plt.legend(loc='best', numpoints=1)
+        plt.xlabel(r'Target',fontsize = 17)
+        plt.ylabel('Frequency distribution',fontsize = 17)
+        plt.text(0.70*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.70*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$\mu_{empiric} = %.3f$''\n'%TargetDistri.mean(),color = 'k',fontsize=16)
+        plt.savefig(config['outputDir'] + "/CustomPlots/Target_%i_to_%i.png"%(lowerPtCut,upperPtCut))
+
+        plt.clf()
+
+
+    if 'recoilslimmedMETs_LongZ' in dictPlot and 'Boson_Pt' in dictPlot and 'LongZCorrectedRecoil_LongZ' in dictPlot and 'LongZCorrectedRecoil_PerpZ' in dictPlot:
+        plt.clf()
+        MVARecoilDiffDistri = np.sqrt((plotData[:,dictPlot["LongZCorrectedRecoil_LongZ"]]+plotData[:,dictPlot["Boson_Pt"]])**2+(plotData[:,dictPlot["LongZCorrectedRecoil_PerpZ"]])**2)
+        PFRecoilDiffDistri = np.sqrt((plotData[:,dictPlot["recoilslimmedMETs_LongZ"]]+plotData[:,dictPlot["Boson_Pt"]])**2 +(plotData[:,dictPlot["recoilslimmedMETs_PerpZ"]])**2)
+        n, bins, patches = plt.hist([PFRecoilDiffDistri,MVARecoilDiffDistri], num_bins, label=[r'$Reco_{Recoil}$',r'$MVA_{Recoil}$'], range=[0,80])
+        plt.xlabel(r"MET in GeV",fontsize = 17)
+        plt.ylabel("Frequency Distribution", fontsize = 17)
+        plt.legend(loc='best', numpoints=1, fontsize = 17)
+        plt.text(0.70*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.50*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$\mu_{Reco} = %.3f$''\n'r'$\mu_{MVA} = %.3f$''\n'%(PFRecoilDiffDistri.mean(),MVARecoilDiffDistri.mean()),color = 'k',fontsize=17)
+        plt.savefig(config['outputDir'] + "/CustomPlots/Diff_Recoil_BosonPt.png")
+        plt.clf()
 
     print("Custom plots created")
 
-def make_PtSpectrumPlot(config, plotData, dictPlot, maxBosonPt=0, stepwidth=0):
 
-  
-    if maxBosonPt==0:
-	maxBosonPt=plotData[:,dictPlot['Boson_Pt']].max()
-    if stepwidth==0:
-	stepwidth = maxBosonPt/100
-    
-    XRange = np.arange(0,maxBosonPt,stepwidth)
-    YSum = np.zeros((XRange.shape[0]-1,1))
-    for index in range(0,XRange.shape[0]-1):
-	AlternativeDistri = plotData[(XRange[index]<plotData[:,dictPlot['Boson_Pt']]) & (XRange[index+1]>plotData[:,dictPlot['Boson_Pt']]) & (plotData[:,dictPlot['nCombinations']]==1)]
-	sumEntries = AlternativeDistri[:,dictPlot['flatPtWeight']].sum()
-	YSum[index] = sumEntries
- 
-    plt.clf()
-    plt.plot(XRange[:-1],YSum[:],'o')
-    plt.xlabel('Boson Pt',fontsize = 17)
-    plt.ylabel('Weighted Boson Pt',fontsize = 17)
-    plt.savefig(config['outputDir'] + "WeightedBosonPt.png")
-    
-    plt.clf()
-    
-    weightPt = plotData[:,dictPlot['flatPtWeight']]
-    
-    num_bins = 50
-    n, bins, patches = plt.hist(plotData[:,dictPlot['Boson_Pt']], num_bins, facecolor='green', alpha=0.5, weights=weightPt)
-    plt.savefig(config['outputDir'] + "WeightedBosonPtHist.png")
-    plt.clf()
-    
-    if 'flatPtWeightBDT' in dictPlot:
-	n, bins, patches = plt.hist(plotData[:,dictPlot['Boson_Pt']], num_bins, facecolor='green', alpha=0.5, weights=plotData[:,dictPlot['flatPtWeightBDT']])
-	plt.savefig(config['outputDir'] + "WeightedBosonPtHistBDT.png")
-	plt.clf()
-    
- 
- 
 
 def make_PhiVariancePlot(config, plotData, dictPlot, targetvariable, ptmin, ptmax, xlabelname = ''):
-  
+
     if xlabelname == '':
-	xlabelname = targetvariable
+        xlabelname = targetvariable
     num_bins = 50
     histDataPhi = plotData[:,dictPlot['Boson_Phi']] + math.pi - plotData[:,dictPlot[targetvariable]]
     print(targetvariable,' phi shape: ',histDataPhi.shape)
     for event in range(0,histDataPhi.shape[0]):
-	if histDataPhi[event] > math.pi:
-	    histDataPhi[event] -= 2*math.pi
-	if histDataPhi[event] < -math.pi:
-	    histDataPhi[event] += 2*math.pi
+        if histDataPhi[event] > math.pi:
+            histDataPhi[event] -= 2*math.pi
+        if histDataPhi[event] < -math.pi:
+            histDataPhi[event] += 2*math.pi
     MSE = (histDataPhi**2).mean()
     n, bins, patches = plt.hist(histDataPhi, num_bins, facecolor='green', alpha=0.5)
     plt.xlabel('Variance %s from true Boson Phi (%i < Boson Pt < %i)GeV. MSE: %f'%(xlabelname, ptmin, ptmax, MSE),fontsize = 17)
     plt.ylabel('Entries',fontsize = 17)
-    plt.savefig(config['outputDir'] + "PhiVariance%s_%ito%iPt.png"%(xlabelname,ptmin,ptmax))
+    plt.savefig(config['outputDir'] + "/CustomPlots/PhiVariance%s_%ito%iPt.png"%(xlabelname,ptmin,ptmax))
     plt.clf()
-    print('MSE %s (%i<Pt<%i): '%(xlabelname,ptmin,ptmax),MSE)    
+    print('MSE %s (%i<Pt<%i): '%(xlabelname,ptmin,ptmax),MSE)
 
     # normal distribution center at x=0 and y=5
     plt.hist2d(plotData[:,dictPlot['Boson_Phi']], histDataPhi,bins = 80, norm=LogNorm())
     #plt.ylim([-0.25,0.25])
     plt.xlabel('Boson Phi (%i < Boson Pt < %i)GeV'%(ptmin, ptmax),fontsize = 17)
     plt.ylabel('Variance of (Prediction-Target) %s'%xlabelname,fontsize = 17)
-    plt.savefig(config['outputDir'] + "Variance2D_%s(%i<Pt<%i).png"%(xlabelname,ptmin,ptmax))
+    plt.colorbar()
+    plt.savefig(config['outputDir'] + "/CustomPlots/Variance2D_%s(%i<Pt<%i).png"%(xlabelname,ptmin,ptmax))
     plt.clf()
 
-    
-    
-    
+
+
+
 def plot_results(config, plotData, dictPlot):
-    
+
     #plotData = plotData[0==plotData[:,dictPlot['NCleanedJets']],:]
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
     plotconfig = config[config['activePlotting']]
-    
+
     num_bins = 50
-  
+
     if not os.path.exists(config['outputDir']):
-	os.makedirs(config['outputDir'])
-	
-    
+        os.makedirs(config['outputDir'])
+
+
     #if not os.path.exists('../plots/PlotVariables'):
 	#os.makedirs('../plots/PlotVariables')
-    
+
     if plotconfig['plotPlotVariables']:
-	if plotconfig['splitNCleanedJets']:
+        if plotconfig['splitNCleanedJets']:
             if 'NCleanedJets' in dictPlot:
                 plotVariableData = plotData[0<plotData[:,dictPlot['NCleanedJets']],:]
                 outputdir = config['outputDir'] + 'PlotVariables/1CleanedJet/'
                 for variable in dictPlot:
                     make_Plot(variable,plotVariableData,dictPlot,outputdir)
-                    
+
                 plotVariableData = plotData[1<plotData[:,dictPlot['NCleanedJets']],:]
                 outputdir = config['outputDir'] + 'PlotVariables/2CleanedJet/'
                 for variable in dictPlot:
                     make_Plot(variable,plotVariableData,dictPlot,outputdir)
-                    
+
                 plotVariableData = plotData[0==plotData[:,dictPlot['NCleanedJets']],:]
                 outputdir = config['outputDir'] + 'PlotVariables/UncleanedJet/'
                 for variable in dictPlot:
                     make_Plot(variable,plotVariableData,dictPlot,outputdir)
-		
-	outputdir = config['outputDir'] + 'PlotVariables/'
-	for variable in dictPlot:
-	    make_Plot(variable,plotData,dictPlot,outputdir)
-      
+
+    outputdir = config['outputDir'] + 'PlotVariables/'
+    for variable in dictPlot:
+        make_Plot(variable,plotData,dictPlot,outputdir)
+
     if plotconfig['plotAdditionalCustomPlots']:
         make_MoreBDTPlots(config, plotData, dictPlot)
     #Boson Pt
@@ -1268,137 +1327,113 @@ def plot_results(config, plotData, dictPlot):
     #comparisonOver.xlabel('Boson_Pt')
     #comparisonMinus.ylabel('|Boson_Pt-Prediction|')
     #comparisonOver.ylabel('Prediction/Boson_Pt')
-    
+
     bosonmin = [0,0,plotconfig['BosonCut']]
     bosonmax = [plotData[:,dictPlot['Boson_Pt']].max(),plotconfig['BosonCut'],plotData[:,dictPlot['Boson_Pt']].max()]
-    
-    #BDT Performance Plots 
+
+    #BDT Performance Plots
 #Phi ControlPlots
     for i, min in enumerate(bosonmin):
         slicedData = plotData[min<=plotData[:,dictPlot['Boson_Pt']],:]
         slicedData = slicedData[bosonmax[i]>=slicedData[:,dictPlot['Boson_Pt']],:]
         if plotconfig['plotBDTPerformance']:
             if plotconfig['plotAdditionalBDTPlots']:
-                histname = 'targetRecoilFromBDT'
-
-                histDataTargetBDT = slicedData[:,dictPlot[histname]]
-
-                histDataOutputBDT = slicedData[:,dictPlot['LongZCorrectedRecoil_LongZ']]/slicedData[:,dictPlot['PhiCorrectedRecoil_LongZ']]
-                
-                histDataVarianceBDT = histDataOutputBDT - histDataTargetBDT
-                
-                n, bins, patches = plt.hist(histDataVarianceBDT, num_bins, range=[-2, 4], facecolor='green', alpha=0.5)
-                plt.xlabel('Scalefactor variance (BDT-Target). (%i  < Boson Pt < %i)GeV, mean: %f'%(min,bosonmax[i],histDataVarianceBDT.mean()),fontsize = 17)
-                plt.ylabel('Entries',fontsize = 17)
-                plt.savefig(config['outputDir'] + "BDT_Scalefactor_VarianceOutputandTarget%ito%i.png"%(min,bosonmax[i]))
-                plt.clf()
-                
-                histDataAtOnce = [histDataTargetBDT,histDataOutputBDT]
-                
-                names = ['Target scale factor, mean: %f'%histDataTargetBDT.mean(),'BDT predicted scale factor, mean %f'%histDataOutputBDT.mean()]
-                n, bins, patches = plt.hist(histDataAtOnce, num_bins, range=[-2, 4], alpha=0.5, label=names)
-                plt.legend(loc='upper right', numpoints=1)
-                plt.xlabel('Comparison scalefactor BDT Output and Target. %i GeV < Boson Pt < %i'%(min,bosonmax[i]),fontsize = 17)
-                plt.ylabel('Entries',fontsize = 17)
-                plt.savefig(config['outputDir'] + "BDT_Scalefactor_OutputAndTarget%ito%i.png"%(min,bosonmax[i]))
-                plt.clf()
-    
                 make_PhiVariancePlot(config, slicedData,dictPlot,'PhiCorrectedRecoil_Phi', min, bosonmax[i], 'BDT Phi')
-    
-    
+
+
             #BDT
-            
-	    if 'LongZCorrectedRecoil_LongZ' in dictPlot:
+
+            if 'LongZCorrectedRecoil_LongZ' in dictPlot:
                 if 'inputLabel' in config:
-		    make_ControlPlots(config, slicedData, dictPlot, 'LongZCorrectedRecoil', 'NVertex', 5,40,5,min,bosonmax[i],config['inputLabel'][0],'\# PV','')
+                    make_ControlPlots(config, slicedData, dictPlot, 'LongZCorrectedRecoil', 'NVertex', 5,40,5,min,bosonmax[i],config['inputLabel'][0],'\# PV','')
                 else:
                     make_ControlPlots(config, slicedData, dictPlot, 'LongZCorrectedRecoil', 'NVertex', 5,40,5,min,bosonmax[i],'MVAMet','\# PV','')
 
 
-		for index in range(len(config['inputFile'])-1):
-		    if 'V%iLongZCorrectedRecoil_LongZ'%index in dictPlot:
-			if 'inputLabel' in config:
-			    make_ControlPlots(config, slicedData, dictPlot, 'V%iLongZCorrectedRecoil'%index, 'NVertex', 5,40,5,min,bosonmax[i],config['inputLabel'][index+1],'\# PV','')
-			else:
-			    make_ControlPlots(config, slicedData, dictPlot, 'V%iLongZCorrectedRecoil'%index, 'NVertex', 5,40,5,min,bosonmax[i],'MVAMet %i'%(index+2),'\# PV','')
+            for index in range(len(config['inputFile'])-1):
+                if 'V%iLongZCorrectedRecoil_LongZ'%index in dictPlot:
+                    if 'inputLabel' in config:
+                        make_ControlPlots(config, slicedData, dictPlot, 'V%iLongZCorrectedRecoil'%index, 'NVertex', 5,40,5,min,bosonmax[i],config['inputLabel'][index+1],'\# PV','')
+                    else:
+                        make_ControlPlots(config, slicedData, dictPlot, 'V%iLongZCorrectedRecoil'%index, 'NVertex', 5,40,5,min,bosonmax[i],'MVAMet %i'%(index+2),'\# PV','')
 
 
-       	    if plotconfig['plotPhiCorrected']: 
-		if 'PhiCorrectedRecoil_LongZ' in dictPlot:
-		    if 'inputLabel' in config:
-			make_ControlPlots(config, slicedData, dictPlot, 'PhiCorrectedRecoil', 'NVertex', 5,40,5,min,bosonmax[i],config['inputLabel'][0],'\# PV','')
-		    else:
-			make_ControlPlots(config, slicedData, dictPlot, 'PhiCorrectedRecoil', 'NVertex', 5,40,5,min,bosonmax[i],'MVAMet','\# PV','')
+       	    if plotconfig['plotPhiCorrected']:
+                if 'PhiCorrectedRecoil_LongZ' in dictPlot:
+                    if 'inputLabel' in config:
+                        make_ControlPlots(config, slicedData, dictPlot, 'PhiCorrectedRecoil', 'NVertex', 5,40,5,min,bosonmax[i],config['inputLabel'][0],'\# PV','')
+                    else:
+                        make_ControlPlots(config, slicedData, dictPlot, 'PhiCorrectedRecoil', 'NVertex', 5,40,5,min,bosonmax[i],'MVAMet','\# PV','')
 
 
-		    for index in range(len(config['inputFile'])-1):
-			if 'V%iPhiCorrectedRecoil_LongZ'%index in dictPlot:
-			    if 'inputLabel' in config:
-				make_ControlPlots(config, slicedData, dictPlot, 'V%iPhiCorrectedRecoil'%index, 'NVertex', 5,40,5,min,bosonmax[i],config['inputLabel'][index+1],'\# PV','')
-			    else:
-				make_ControlPlots(config, slicedData, dictPlot, 'V%iPhiCorrectedRecoil'%index, 'NVertex', 5,40,5,min,bosonmax[i],'MVAMet %i'%(index+2),'\# PV','')
-        
-        
+            for index in range(len(config['inputFile'])-1):
+                if 'V%iPhiCorrectedRecoil_LongZ'%index in dictPlot:
+                    if 'inputLabel' in config:
+                        make_ControlPlots(config, slicedData, dictPlot, 'V%iPhiCorrectedRecoil'%index, 'NVertex', 5,40,5,min,bosonmax[i],config['inputLabel'][index+1],'\# PV','')
+                    else:
+                        make_ControlPlots(config, slicedData, dictPlot, 'V%iPhiCorrectedRecoil'%index, 'NVertex', 5,40,5,min,bosonmax[i],'MVAMet %i'%(index+2),'\# PV','')
+
+
         #slimmedMet
         if 'recoilslimmedMETs_LongZ' in dictPlot:
             make_ControlPlots(config, slicedData, dictPlot, 'recoilslimmedMETs', 'NVertex', 5,40,5,min,bosonmax[i],'PFMet','\# PV','')
-        
-        
+
+
         #Puppi-Met
-	if plotconfig['plotPuppiPerformance']:
-	    if 'recoilslimmedMETsPuppi_LongZ' in dictPlot:
-		make_ControlPlots(config, slicedData, dictPlot, 'recoilslimmedMETsPuppi', 'NVertex', 5,40,5,min,bosonmax[i],'PuppiMet','\# PV','')
-        
-       
-	plt.clf()
-	plt.figure(4) 
+        if plotconfig['plotPuppiPerformance']:
+            if 'recoilslimmedMETsPuppi_LongZ' in dictPlot:
+                make_ControlPlots(config, slicedData, dictPlot, 'recoilslimmedMETsPuppi', 'NVertex', 5,40,5,min,bosonmax[i],'PuppiMet','\# PV','')
+
+
+        plt.clf()
+        plt.figure(4)
         plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 17)
-    	plt.ylabel(r'$<U_\| / p_t^Z>$',fontsize = 17)
-    	plt.title('Response 'r'$U_\|$'' vs 'r'#PV', fontsize = 20)
+        plt.ylabel(r'$<U_\| / p_t^Z>$',fontsize = 17)
+        plt.title('Response 'r'$U_\|$'' vs 'r'#PV', fontsize = 20)
         legend = plt.legend(loc='best', shadow=True, numpoints=1)
-    	plt.plot((plt.xlim()[0], plt.xlim()[1]), (1, 1), 'k--')
-	if config['fixedRange']: 
-	    plt.ylim([0.5,1.1])
+        plt.plot((plt.xlim()[0], plt.xlim()[1]), (1, 1), 'k--')
+        if config['fixedRange']:
+            plt.ylim([0.5,1.1])
         plt.savefig(config['outputDir'] + 'Response_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
 
         plt.figure(5)
         plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 17)
-    	plt.ylabel(r'$\sigma(<U_\| - p_t^Z>)$'' in GeV',fontsize = 17)
-    	plt.title('Resolution 'r'$U_\|$'' vs 'r'#PV', fontsize = 20)
+        plt.ylabel(r'$\sigma(<U_\| - p_t^Z>)$'' in GeV',fontsize = 17)
+        plt.title('Resolution 'r'$U_\|$'' vs 'r'#PV', fontsize = 20)
         legend = plt.legend(loc='best', shadow=True, numpoints=1)
-	if config['fixedRange']: 
-	    plt.ylim([10,40])
+        if config['fixedRange']:
+            plt.ylim([10,40])
         plt.savefig(config['outputDir'] + 'Resolution_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
 
         plt.figure(6)
         plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 17)
         plt.ylabel('Resolution / Response',fontsize = 17)
-    	plt.title('Response Corrected vs 'r'#PV', fontsize = 20)
+        plt.title('Response Corrected vs 'r'#PV', fontsize = 20)
         legend = plt.legend(loc='best', shadow=True, numpoints=1)
-	if config['fixedRange']: 
-	    plt.ylim([10,40])
+        if config['fixedRange']:
+            plt.ylim([10,40])
         plt.savefig(config['outputDir'] + 'ResponseCorrected_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
 
         plt.figure(7)
         legend = plt.legend(loc='best', shadow=True, numpoints=1)
         plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 17)
-    	plt.ylabel(r'$<U_\bot>$',fontsize = 17)
-    	plt.title('Response 'r'$U_\bot$'' vs 'r'#PV', fontsize = 20)
-	if config['fixedRange']: 
-	    plt.ylim([-1,1])
+        plt.ylabel(r'$<U_\bot>$',fontsize = 17)
+        plt.title('Response 'r'$U_\bot$'' vs 'r'#PV', fontsize = 20)
+        if config['fixedRange']:
+            plt.ylim([-1,1])
         plt.savefig(config['outputDir'] + 'ResponsePerp_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
 
         plt.figure(8)
         plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 17)
-    	plt.ylabel(r'$\sigma(<U_\bot>)$',fontsize = 17)
-    	plt.title('Resolution 'r'$U_\bot$'' vs 'r'#PV', fontsize = 20)
+        plt.ylabel(r'$\sigma(<U_\bot>)$',fontsize = 17)
+        plt.title('Resolution 'r'$U_\bot$'' vs 'r'#PV', fontsize = 20)
         legend = plt.legend(loc='best', shadow=True, numpoints=1)
-	if config['fixedRange']: 
-	    plt.ylim([10,40])
+        if config['fixedRange']:
+            plt.ylim([10,40])
         plt.savefig(config['outputDir'] + 'ResolutionPerp_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
 
@@ -1406,8 +1441,8 @@ def plot_results(config, plotData, dictPlot):
         plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 17)
         plt.ylabel(r'$E_{t\|}^{miss}/E_{t,gen}^{miss}$',fontsize = 17)
         legend = plt.legend(loc='best', shadow=True, numpoints=1)
-	if config['fixedRange']: 
-	    plt.ylim([0,2])
+        if config['fixedRange']:
+            plt.ylim([0,2])
         plt.savefig(config['outputDir'] + 'METResponse_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
 
@@ -1416,77 +1451,77 @@ def plot_results(config, plotData, dictPlot):
         plt.ylabel(r'$\sigma(E_{t\|}^{miss}-E_{t,gen}^{miss})$',fontsize = 17)
         plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_t^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 17)
         legend = plt.legend(loc='best', shadow=True, numpoints=1)
-	if config['fixedRange']: 
-	    plt.ylim([10,50])
+        if config['fixedRange']:
+            plt.ylim([10,50])
         plt.savefig(config['outputDir'] + 'METResolution_(%i<Pt<%i)_vs_NVertex'%(min,bosonmax[i]))
         plt.clf()
         plt.figure(0)
-        
+
 
 	#additional BDTPlots
         if plotconfig['plotAdditionalBDTPlots']:
             make_PhiVariancePlot(config, slicedData,dictPlot,'recoilslimmedMETs_Phi', min, bosonmax[i], 'PF Phi')
-        
+
             make_PhiVariancePlot(config, slicedData,dictPlot,'recoilslimmedMETsPuppi_Phi', min, bosonmax[i],'PUPPI Phi')
-	  
-    
-    
+
+
+
     #Boson PT
 
     #BDT Performance
     if plotconfig['plotBDTPerformance']:
 	#MVAMet
-	if 'LongZCorrectedRecoil_LongZ' in dictPlot:
-	    #If labeling is activated
-	    if 'inputLabel' in config:
-		make_ControlPlots(config, plotData, dictPlot, 'LongZCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][0],'p_t^Z','GeV')
-	    else:
-		make_ControlPlots(config, plotData, dictPlot, 'LongZCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,'MVAMet','p_t^Z','GeV')
+        if 'LongZCorrectedRecoil_LongZ' in dictPlot:
+            #If labeling is activated
+            if 'inputLabel' in config:
+                make_ControlPlots(config, plotData, dictPlot, 'LongZCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][0],'p_t^Z','GeV')
+            else:
+                make_ControlPlots(config, plotData, dictPlot, 'LongZCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,'MVAMet','p_t^Z','GeV')
 
-	    #for additional inputs
-	    for index in range(len(config['inputFile'])-1):
-		if 'V%iLongZCorrectedRecoil_LongZ'%index in dictPlot:
-		    if 'inputLabel' in config:
-			make_ControlPlots(config, plotData, dictPlot, 'V%iLongZCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][index+1],'p_t^Z','GeV')
-		    else:
-			make_ControlPlots(config, plotData, dictPlot, 'V%iLongZCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,'MVAMet %i'%(index+2),'p_t^Z','GeV') 
+            #for additional inputs
+            for index in range(len(config['inputFile'])-1):
+                if 'V%iLongZCorrectedRecoil_LongZ'%index in dictPlot:
+                    if 'inputLabel' in config:
+                        make_ControlPlots(config, plotData, dictPlot, 'V%iLongZCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][index+1],'p_t^Z','GeV')
+                    else:
+                        make_ControlPlots(config, plotData, dictPlot, 'V%iLongZCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,'MVAMet %i'%(index+2),'p_t^Z','GeV')
 
-	#Phi Corrected MVAMET Plots 
-	if plotconfig['plotPhiCorrected']:
-	    if 'PhiCorrectedRecoil_LongZ' in dictPlot:
-		if 'inputLabel' in config:
-		    make_ControlPlots(config, plotData, dictPlot, 'PhiCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][0],'p_t^Z','GeV')
-		else:
-		    make_ControlPlots(config, plotData, dictPlot, 'PhiCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,'MVAMet','p_t^Z','GeV')
+        #Phi Corrected MVAMET Plots
+        if plotconfig['plotPhiCorrected']:
+            if 'PhiCorrectedRecoil_LongZ' in dictPlot:
+                if 'inputLabel' in config:
+                    make_ControlPlots(config, plotData, dictPlot, 'PhiCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][0],'p_t^Z','GeV')
+                else:
+                    make_ControlPlots(config, plotData, dictPlot, 'PhiCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,'MVAMet','p_t^Z','GeV')
 
-		for index in range(len(config['inputFile'])-1):
-		    if 'V%iPhiCorrectedRecoil_LongZ'%index in dictPlot:
-			if 'inputLabel' in config:
-			    make_ControlPlots(config, plotData, dictPlot, 'V%iPhiCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][index+1],'p_t^Z','GeV')
-			else:
-			    make_ControlPlots(config, plotData, dictPlot, 'V%iPhiCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,'MVAMet %i'%(index+2),'p_t^Z','GeV')    
+                for index in range(len(config['inputFile'])-1):
+                    if 'V%iPhiCorrectedRecoil_LongZ'%index in dictPlot:
+                        if 'inputLabel' in config:
+                            make_ControlPlots(config, plotData, dictPlot, 'V%iPhiCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][index+1],'p_t^Z','GeV')
+                        else:
+                            make_ControlPlots(config, plotData, dictPlot, 'V%iPhiCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,'MVAMet %i'%(index+2),'p_t^Z','GeV')
 
     #PF Met Control Plots Pt
     if 'recoilslimmedMETs_LongZ' in dictPlot:
         make_ControlPlots(config, plotData, dictPlot, 'recoilslimmedMETs', 'Boson_Pt', 10,200,10,0,0,'PFMet','p_t^Z','GeV')
-    
+
     #Puppi Met Control Plots Pt
-    if plotconfig['plotPuppiPerformance']:    
-	if 'recoilslimmedMETsPuppi_LongZ' in dictPlot:
-	    make_ControlPlots(config, plotData, dictPlot, 'recoilslimmedMETsPuppi', 'Boson_Pt', 10,200,10,0,0,'PuppiMet','p_t^Z','GeV')
-    
-    
+    if plotconfig['plotPuppiPerformance']:
+        if 'recoilslimmedMETsPuppi_LongZ' in dictPlot:
+            make_ControlPlots(config, plotData, dictPlot, 'recoilslimmedMETsPuppi', 'Boson_Pt', 10,200,10,0,0,'PuppiMet','p_t^Z','GeV')
+
+
 
 
     plt.figure(4)
     legend = plt.legend(loc='best', shadow=True, numpoints=1)
     #legend.get_frame().set_alpha(0.5)
-    plt.xlabel(r'$p_t^Z$'' in GeV', fontsize = 17)
     plt.ylabel(r'$<U_\| / p_t^Z>$', fontsize = 17)
+    plt.xlabel(r'$p_t^Z$'' in GeV', fontsize = 17)
     plt.title('Response 'r'$U_\|$'' vs 'r'$p_t^Z$', fontsize= 20)
     plt.plot((plt.xlim()[0], plt.xlim()[1]), (1, 1), 'k--')
-    if config['fixedRange']: 
-	plt.ylim([0.5,1.1])
+    if config['fixedRange']:
+        plt.ylim([0.5,1.1])
     plt.savefig(config['outputDir'] + 'Response_vs_BosonPt')
     plt.clf()
     plt.figure(5)
@@ -1495,8 +1530,8 @@ def plot_results(config, plotData, dictPlot):
     plt.title('Resolution 'r'$U_\|$'' vs 'r'$p_t^Z$', fontsize = 20)
     legend = plt.legend(loc='best', shadow=True, numpoints=1)
     #legend.get_frame().set_alpha(0.5)
-    if config['fixedRange']: 
-	plt.ylim([10,40])
+    if config['fixedRange']:
+        plt.ylim([10,40])
     plt.savefig(config['outputDir'] + 'Resolution_vs_BosonPt')
     plt.clf()
     plt.figure(6)
@@ -1504,8 +1539,8 @@ def plot_results(config, plotData, dictPlot):
     plt.ylabel('Resolution / Response',fontsize = 17)
     plt.title('Response Corrected vs 'r'$p_t^Z$', fontsize = 20)
     legend = plt.legend(loc='best', shadow=True, numpoints=1)
-    if config['fixedRange']: 
-	plt.ylim([10,40])
+    if config['fixedRange']:
+        plt.ylim([10,40])
     #legend.get_frame().set_alpha(0.5)
     plt.savefig(config['outputDir'] + 'ResponseCorrected_vs_BosonPt')
     plt.clf()
@@ -1515,8 +1550,8 @@ def plot_results(config, plotData, dictPlot):
     plt.xlabel(r'$p_t^Z$'' in GeV', fontsize = 17)
     plt.ylabel(r'$<U_\bot>$',fontsize = 17)
     plt.title('Response 'r'$U_\bot$'' vs 'r'$p_t^Z$', fontsize = 20)
-    if config['fixedRange']: 
-	plt.ylim([-1,1])
+    if config['fixedRange']:
+        plt.ylim([-1,1])
     plt.savefig(config['outputDir'] + 'ResponsePerp_vs_BosonPt')
     plt.clf()
     plt.figure(8)
@@ -1525,8 +1560,8 @@ def plot_results(config, plotData, dictPlot):
     plt.title('Resolution 'r'$U_\bot$'' vs 'r'$p_t^Z$', fontsize = 20)
     legend = plt.legend(loc='best', shadow=True, numpoints=1)
     #legend.get_frame().set_alpha(0.5)
-    if config['fixedRange']: 
-	plt.ylim([10,40])
+    if config['fixedRange']:
+        plt.ylim([10,40])
     plt.savefig(config['outputDir'] + 'ResolutionPerp_vs_BosonPt')
     plt.clf()
     plt.figure(9)
@@ -1536,8 +1571,8 @@ def plot_results(config, plotData, dictPlot):
     #plt.ylabel('MET_Long/genMET',fontsize = 17)
     plt.ylabel(r'$E_{t\|}^{miss}/E_{t,gen}^{miss}$',fontsize = 17)
     #plt.ylabel(r'$\ensuremath{{\not\mathrel{E}}_T}$',fontsize = 17)
-    if config['fixedRange']: 
-	plt.ylim([0,2])
+    if config['fixedRange']:
+        plt.ylim([0,2])
     plt.savefig(config['outputDir'] + 'METResponse_vs_BosonPt')
     plt.clf()
     plt.figure(10)
@@ -1545,31 +1580,28 @@ def plot_results(config, plotData, dictPlot):
     plt.ylabel(r'$\sigma(E_{t\|}^{miss}-E_{t,gen}^{miss})$',fontsize = 17)
     legend = plt.legend(loc='best', shadow=True, numpoints=1)
     #legend.get_frame().set_alpha(0.5)
-    if config['fixedRange']: 
-	plt.ylim([10,50])
+    if config['fixedRange']:
+        plt.ylim([10,50])
     plt.savefig(config['outputDir'] + 'METResolution_vs_BosonPt')
     plt.clf()
     plt.figure(0)
-	    
-    
+
+
     #Jet study plots, can be enabled in the config
     if plotconfig['plotJetStudyPlots'] and 'Jet0_Pt' in dictPlot and 'Jet1_Pt' in dictPlot:
-	make_JetStudyPlots(config, plotData, dictPlot)
-    
-    #make Boson Pt Spectrum with weights
-    if plotconfig['plotAdditionalBDTPlots']:
-        make_PtSpectrumPlot(config, plotData, dictPlot, 650, 5)
+        make_JetStudyPlots(config, plotData, dictPlot)
+
 
     print('Plots created')
-    
+
     return True
 
-    
+
 
 
 
 def main(config):
-    
+
 
     # Load the dataset
     print("Loading data...")
@@ -1577,23 +1609,25 @@ def main(config):
 
     #constraints to data
     if 'constraints' in config:
-	print("Size of dataset before applying constraint: %i"%plotData.shape[0])
-	exec("{}".format("plotData = plotData[%s,:]"%config['constraints']))
-	print("Size of dataset after applying constraint: %i"%plotData.shape[0])
+        print("Size of dataset before applying constraint: %i"%plotData.shape[0])
+        exec("{}".format("plotData = plotData[%s,:]"%config['constraints']))
+        print("Size of dataset after applying constraint: %i"%plotData.shape[0])
     else:
-	print("Size of dataset: %i"%plotData.shape[0])
+        print("Size of dataset: %i"%plotData.shape[0])
+
+    print(plotData.shape)
 
     # perform plotting
     plot_results(config, plotData, dictPlot)
 
     #save the config as json in the plots folder
     with open(config['outputDir'] + 'config_%s.json'%os.path.basename(config['outputDir'][:-1]), 'w') as fp:
-	json.dump(config, fp, sort_keys=True, indent=4)
+        json.dump(config, fp, sort_keys=True, indent=4)
 
     #exporting of the plots to ekpwww/nzaeh
     if 'export' in config:
-	bashCommand = 'cp -r %s /ekpwww/nzaeh/public_html/'%config['outputDir']
-	os.system(bashCommand)
+        bashCommand = 'cp -r %s /ekpwww/nzaeh/public_html/'%config['outputDir']
+        os.system(bashCommand)
 
     #copying index.php which allows viewing all plots at once on ekpwww by opening php.index
     bashCommand = 'cp index.php /ekpwww/nzaeh/public_html/%s/'%os.path.basename(config['outputDir'][:-1])
@@ -1619,27 +1653,27 @@ if __name__ == '__main__':
 
 
     with open(args.plottingconfig, 'r') as f:
-	config = json.load(f)
-    
+        config = json.load(f)
+
     if args.export:
-	print('Exporting files to ekpwww afterwards.')
-	config['export'] = True
+        print('Exporting files to ekpwww afterwards.')
+        config['export'] = True
 
     if not 'method' in config:
-    	config['method'] = args.method
+        config['method'] = args.method
 
     if config['method'] == 'Alpha':
-	config['method'] = 'AlphaInclInt'
+        config['method'] = 'AlphaInclInt'
 
     if not args.inputfile == '':
-	config['inputFile'] = args.inputfile
+        config['inputFile'] = args.inputfile
 
     if args.fixedRange:
-	config['fixedRange'] = True
-	print('Ranges will be fixed to predefined ranges.')
+        config['fixedRange'] = True
+        print('Ranges will be fixed to predefined ranges.')
 
     if not args.inputlabel == '':
-    	config['inputLabel'] = args.inputlabel
+        config['inputLabel'] = args.inputlabel
 
     if not args.outputfolder == '':
         config['outputDir'] = "../plots/" + args.outputfolder + "/"
@@ -1647,27 +1681,27 @@ if __name__ == '__main__':
     print('Saving in %s'%config['outputDir'])
 
     if len(args.method) == 1:
-	print('Used method: %s'%config['method'][0])
-	if len(args.inputfile) == 1:    
-	    if not args.constraints == '':
-		config['constraints'] = args.constraints
-		print('Inputfile: %s with constraint %s'%(config['inputFile'][0],args.constraints))
-	    else:
-		print('Inputfile: %s'%config['inputFile'][0])
-	else:
-	    for names in config['inputFile']:
-		if not args.constraints == '':
-		    config['constraints'] = args.constraints
-		    print('Inputfile: %s with constraint %s'%(names,args.constraints))
-		else:
-		    print('Inputfile: %s'%names)
+        print('Used method: %s'%config['method'][0])
+        if len(args.inputfile) == 1:
+            if not args.constraints == '':
+                config['constraints'] = args.constraints
+                print('Inputfile: %s with constraint %s'%(config['inputFile'][0],args.constraints))
+            else:
+                print('Inputfile: %s'%config['inputFile'][0])
+        else:
+            for names in config['inputFile']:
+                if not args.constraints == '':
+                    config['constraints'] = args.constraints
+                    print('Inputfile: %s with constraint %s'%(names,args.constraints))
+                else:
+                    print('Inputfile: %s'%names)
     else:
-	for index in range(len(config['inputFile'])):
-	    if not args.constraints == '':
-		config['constraints'] = args.constraints
-		print('Inputfile: %s with constraint %s and method %s'%(args.inputfile[index],args.constraints,config['method'][index]))
-	    else:
-		print('Inputfile: %s with method %s'%(config['inputFile'][index],config['method'][index]))
+        for index in range(len(config['inputFile'])):
+            if not args.constraints == '':
+                config['constraints'] = args.constraints
+                print('Inputfile: %s with constraint %s and method %s'%(args.inputfile[index],args.constraints,config['method'][index]))
+            else:
+                print('Inputfile: %s with method %s'%(config['inputFile'][index],config['method'][index]))
 
     main(config)
 

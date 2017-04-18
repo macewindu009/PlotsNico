@@ -1,0 +1,15 @@
+{
+    "x_bins": [
+        "1 9 13 17 21 29"
+    ], 
+    "x_expressions": [
+        "npv"
+    ], 
+    "x_label": "nPV",
+    "weights": [
+        "eventWeight*(nbtag == 0)*(extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(againstMuonTight3_2 > 0.5)*(dilepton_veto < 0.5)*(againstElectronVLooseMVA6_2 > 0.5)*((q_1*q_2)<0.0)"
+    ],
+    "texts_size" : "30", 
+    "texts_x" : "0.25",
+    "texts_y" : "0.2"
+}

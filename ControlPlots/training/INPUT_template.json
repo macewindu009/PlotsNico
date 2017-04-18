@@ -1,0 +1,46 @@
+{
+    "colors": [
+        "black", 
+        "grey", 
+        "royalblue", 
+        "crimson",
+        "teal",
+        "darkviolet",
+        "green"
+    ], 
+    "grid" : true,
+    "files": [
+        "DY.root"
+    ], 
+    "folders": [
+        "MAPAnalyzer/t"
+    ], 
+    "friend_filenames": [
+        "LongZCorrectedRecoil.root"
+    ], 
+    "friend_treenames": [
+        "LongZCorrectedRecoil"
+    ], 
+    "labels": [
+        "PF T1", 
+        "PF", 
+        "PU Corrected",
+        "No PU",
+        "Track", 
+        "PU",
+        "PUPPI T1"
+    ], 
+    "legend_cols": 2, 
+    "line_styles": [
+        "-"
+    ], 
+    "markers": [
+        "."
+    ], 
+    "x_errors": [
+        false
+    ], 
+    "y_errors": [
+        false
+    ]
+}

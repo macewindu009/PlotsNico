@@ -1,0 +1,36 @@
+{
+    "filename": "Longitudinal_Response_NPV", 
+    "line_styles": [
+        "-", "--"
+    ], 
+    "legend_cols" : 3,
+    "tree_draw_options": [
+        "prof"
+    ], 
+    "title" : "$p_T^{Z} > 30 \\mathrm{GeV}$",
+    "weights": [
+        "(select)&&nCombinations==1&&Boson_Pt>30", 
+        "z_pT>30"
+    ], 
+    "x_bins": [
+        "10,5,25"
+    ], 
+    "x_expressions": [
+        "NVertex", "nPV"
+    ], 
+    "x_label": "NPV", 
+    "y_expressions": [
+        "recoilslimmedMETs_LongZ/-Boson_Pt",             "particleFlowUpdate_Upar/-z_pT", 
+        "recoilpatpfTrackMET_LongZ/-Boson_Pt",        "trackUpdate_Upar/-z_pT",
+        "recoilpatpfNoPUMET_LongZ/-Boson_Pt",         "noPileUpUpdate_Upar/-z_pT",
+        "recoilpatpfPUMET_LongZ/-Boson_Pt",           "pileUpUpdate_Upar/-z_pT",
+        "recoilslimmedMETsPuppi_LongZ/-Boson_Pt",     "0",
+        "recoilpatpfPUCorrectedMET_LongZ/-Boson_Pt",  "pileUpCorrectedUpdate_Upar/-z_pT",
+        "LongZCorrectedRecoil_LongZ/-Boson_Pt",     "RecoilCor_Upar/-z_pT"
+    ], 
+    "y_label": "$U_{\\parallel}/p_T^Z$", 
+    "y_lims": [
+        0, 
+        2.0
+    ]
+}

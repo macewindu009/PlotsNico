@@ -1,0 +1,20 @@
+{
+    "y_expressions": [
+        "recoMetPar",
+        "recoMetPar",
+        "recoMetPar",
+        "recoMetPar",
+        "recoPfMetPar",
+        "recoPfMetPar",
+        "recoPfMetPar",
+        "recoPfMetPar"
+    ], 
+    "y_label": "$U_{\\parallel}/p_T^Z$", 
+    "y_bins": [
+        "50,-100,100"
+    ], 
+    "y_lims": [
+        0, 
+        30.0
+    ]
+}

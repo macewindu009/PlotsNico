@@ -1,0 +1,57 @@
+{
+    "colors" : [
+         "black", 
+         "black", 
+         "red", 
+         "red", 
+         "blue", 
+         "blue", 
+         "orange", 
+         "orange", 
+         "green",
+         "purple", 
+         "purple", 
+         "goldenrod",
+         "goldenrod"
+    ],
+    "files": [
+        "DY.root",
+        "/afs/desy.de/user/r/rfriese//dust/mvamet/data4/mvaTrainingSample-DYSpring15-v2/mvaTrainingSample.root"
+    ], 
+    "friend_treenames" : [ "LongZCorrectedRecoil",
+     "particleFlowUpdate trackUpdate noPileUpUpdate pileUpCorrectedUpdate pileUpUpdate RecoilCor"],
+    "friend_filenames" : [
+        "LongZCorrectedRecoil.root",
+        "/afs/desy.de/user/r/rfriese//dust/mvamet/data4/mvaTrainingSample-DYSpring15-v2/particleFlowUpdate.root /afs/desy.de/user/r/rfriese//dust/mvamet/data4/mvaTrainingSample-DYSpring15-v2/trackUpdate.root /afs/desy.de/user/r/rfriese//dust/mvamet/data4/mvaTrainingSample-DYSpring15-v2/noPileUpUpdate.root /afs/desy.de/user/r/rfriese//dust/mvamet/data4/mvaTrainingSample-DYSpring15-v2/pileUpCorrectedUpdate.root /afs/desy.de/user/r/rfriese//dust/mvamet/data4/mvaTrainingSample-DYSpring15-v2/pileUpUpdate.root /afs/desy.de/user/r/rfriese//dust/mvamet/data4/mvaTrainingSample-DYSpring15-v2/RecoilCor.root"
+    ],
+    "folders": [
+        "MAPAnalyzer/t",
+        "Flat"
+    ], 
+    "labels": [
+        "PF", "PF old",
+        "Track", "Track old",
+        "NoPU", "NoPU old", 
+        "PU", "PU old",
+        "PUPPI", 
+        "PU Corr", "PU Corr old"
+    ], 
+    "nicks" : ["nick1", "nick2", "nick3", "nick4", "nick5", "nick6", "nick7", "nick8", "nick9", "nick10_noplot", "nick11", "nick12" ],
+    "line_styles": [
+        "-", "--",
+        "-", "--",
+        "-", "--",
+        "-", "--",
+        "-", 
+        "-", "--"
+    ], 
+    "markers": [
+        "."
+    ], 
+    "x_errors": [
+        false
+    ], 
+    "y_errors": [
+        false
+    ]
+}

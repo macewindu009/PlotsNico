@@ -1,10 +1,10 @@
 import numpy as np
 
 import matplotlib.pyplot as plt
-minUni = 1000
-maxUni = 1010
+minUni = 150
+maxUni = 160
 mu = (maxUni+minUni)/2
-sigma = 15
+sigma = 29.5
 samples = 100000
 
 

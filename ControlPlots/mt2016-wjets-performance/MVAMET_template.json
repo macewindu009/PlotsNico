@@ -1,0 +1,53 @@
+{
+    "grid" : true,
+    "colors": [
+        "goldenrod", 
+        "black"
+    ], 
+    "directories": [
+        "/nfs/dust/cms/user/rfriese/htautau/artus/2016-09-15_22-09_PfMetCov/merged-full/"
+    ], 
+    "energies": [
+        13
+    ], 
+    "files": [
+        "W1JetsToLNu_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8/*.root W2JetsToLNu_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8/*.root W2JetsToLNu_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8_ext1/*.root W3JetsToLNu_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8/*.root W3JetsToLNu_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8_ext1/*.root W4JetsToLNu_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8/*.root W4JetsToLNu_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8_ext1/*.root W4JetsToLNu_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8_ext2/*.root WJetsToLNu_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8/*.root WJetsToLNu_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8_ext2/*.root"
+    ], 
+    "folders": [
+        "mt_jecUncNom/ntuple"
+    ], 
+    "labels": [
+        "MVA (sim.)", 
+        "PF (sim.)"
+    ], 
+    "legend_cols": 2, 
+    "line_styles": [
+        "-", 
+        "-"
+    ], 
+    "lumis": [
+        12.9
+    ], 
+    "markers": [
+        "", 
+        ""
+    ], 
+    "nicks": [
+        "mva_mc", 
+        "pf_mc"
+    ], 
+    "nicks_blacklist": [
+        "noplot"
+    ], 
+    "output_dir": "/afs/desy.de/user/r/rfriese/plots/2016-09-02-MVAMET-thesis/METPlots/thesis-data/mt2016-performance/plots",
+    "scale_factors": [
+        12900.0
+    ], 
+    "step": true, 
+    "title": "$W+ Jets$", 
+    "x_errors": [
+        [false ]
+    ], 
+    "y_errors": 
+        [false]
+}

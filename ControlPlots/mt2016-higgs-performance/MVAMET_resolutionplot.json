@@ -1,0 +1,23 @@
+{
+    "analysis_modules": [
+        "ProjectByFit"
+    ], 
+    "fit_backend": [
+        "ROOT"
+    ], 
+    "projection_function": [
+        "gaus"
+    ], 
+    "projection_parameters": [
+        "1000,10,10"
+    ], 
+    "projection_to_nick" : [
+        "mva_qqh", 
+        "mva_ggh", 
+        "pf_qqh",
+        "pf_ggh"
+    ], 
+    "projection_to_plot": [
+        "2"
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "x_bins": [
+        "5 25 45 65 85"
+    ], 
+    "x_expressions": [
+        "ptvis"
+    ], 
+    "weights": [
+        "eventWeight*(nbtag == 0)*(extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(againstMuonTight3_2 > 0.5)*(dilepton_veto < 0.5)*(againstElectronVLooseMVA6_2 > 0.5)*((q_1*q_2)<0.0)"
+    ],
+    "x_label": "$p_{T,vis}^H$"
+}

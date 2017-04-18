@@ -1,0 +1,48 @@
+{
+    "directories": [
+        "/nfs/dust/cms/user/rfriese/htautau/artus/2016-09-15_22-09_PfMetCov/merged/"
+    ], 
+    "colors" : ["darkred", "red"],
+    "energies": [
+        13
+    ], 
+    "files": [
+        "W1JetsToLNu_RunIISpring16MiniAODv2_PUSpring16_13TeV_MINIAOD_madgraph-pythia8/*.root W2JetsToLNu_RunIISpring16MiniAODv2_PUSpring16_13TeV_MINIAOD_madgraph-pythia8/*.root W4JetsToLNu_RunIISpring16MiniAODv2_PUSpring16_13TeV_MINIAOD_madgraph-pythia8/*.root W3JetsToLNu_RunIISpring16MiniAODv2_PUSpring16_13TeV_MINIAOD_madgraph-pythia8/*.root WJetsToLNu_RunIISpring16MiniAODv2_PUSpring16_13TeV_MINIAOD_madgraph-pythia8/*.root"
+    ], 
+    "folders": [
+        "mt_jecUncNom/ntuple"
+    ], 
+    "title" : "W+Jets",
+    "labels": [
+        "MVA", "PF"
+    ], 
+    "lumis": [
+        12.9
+    ], 
+    "markers": [
+        "."
+    ], 
+    "output_dir": "plots", 
+    "scale_factors": [
+        12900.0
+    ], 
+    "weights": [
+        "(1.0)*(1.0)*(1.0)*(1.0)*(((1.0)*(1.0)))*eventWeight*(((npartons == 0 || npartons >= 5)*2.1809966268e-3) + ((npartons == 1)*2.602609942e-4) + ((npartons == 2)*1.209708431e-4) + ((npartons == 3)*5.71488637e-5) + ((npartons == 4)*6.27792554e-5))/(numberGeneratedEventsWeight*crossSectionPerEventWeight*sampleStitchingWeight)*(nbtag == 0)*(extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(againstMuonTight3_2 > 0.5)*(dilepton_veto < 0.5)*(againstElectronVLooseMVA6_2 > 0.5)*(mt_1<40.0)*(byTightIsolationMVArun2v1DBoldDMwLT_2 > 0.5)*(iso_1 < 0.15)*((q_1*q_2)<0.0)"
+    ], 
+    "grid" : true,
+    "filename" : "recoMetOnGenMetProjectionPerp", 
+    "x_expressions": [
+        "recoMetOnGenMetProjectionPerp",
+        "recoPfMetOnGenMetProjectionPerp"
+    ], 
+    "line_styles" : ["-"],
+    "x_label": "$E_T^{\\perp} / \\mathrm{GeV}$", 
+    "x_bins" : "50,-100,100",
+    "x_errors" : [true],
+    "y_errors" : [true],
+    "y_rel_lims": [
+        0.0, 
+        1.4
+    ], 
+    "year": "2016"
+}

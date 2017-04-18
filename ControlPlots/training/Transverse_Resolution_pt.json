@@ -1,0 +1,27 @@
+{
+    "filename": "Transverse_Resolution_pt", 
+	"y_lims" : [0,40],
+    "weights": [
+        "(select)&&nCombinations==1", 
+         "1"
+    ], 
+    "x_bins": [
+        "15,0,150"
+    ], 
+    "x_expressions": [
+        "Boson_Pt", "z_pT"
+    ], 
+    "x_label": "$p_T^Z$", 
+    "y_bins": [
+        "50,-100,100"
+    ], 
+    "y_expressions": [
+        "recoilslimmedMETs_PerpZ",             "particleFlowUpdate_Uperp", 
+        "recoilpatpfTrackMET_PerpZ",        "trackUpdate_Uperp",
+        "recoilpatpfNoPUMET_PerpZ",         "noPileUpUpdate_Uperp",
+        "recoilpatpfPUMET_PerpZ",           "pileUpUpdate_Uperp",
+        "recoilslimmedMETsPuppi_PerpZ",     "0",
+        "recoilpatpfPUCorrectedMET_PerpZ",           "pileUpCorrectedUpdate_Uperp"
+    ], 
+    "y_label": "$U_{\\perp}$ Resolution [GeV]"
+}

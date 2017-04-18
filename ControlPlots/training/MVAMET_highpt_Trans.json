@@ -1,0 +1,58 @@
+{
+    "title": "$p_T^Z > 300 \\mathrm{GeV}$",
+    "analysis_modules": [
+        "FunctionPlot"
+    ], 
+    "colors": [
+        "orange", 
+        "goldenrod"
+    ], 
+    "filename": "MVAMET_higpht_Trans", 
+    "files": [
+        "highpt.root", 
+        "highptwithlowpt.root"
+    ], 
+    "folders": [
+        "t"
+    ], 
+    "function_fit": [
+        "nick0", 
+        "nick1"
+    ], 
+    "function_parameters": [
+        "1000,1,1"
+    ], 
+    "function_ranges": [
+        "-80,80"
+    ], 
+    "functions": [
+        "gaus"
+    ], 
+    "labels": [
+        "MVA high-pt", 
+        "MVA"
+    ], 
+    "line_styles": [
+        "-"
+    ], 
+    "markers": [
+        ".", 
+        ""
+    ], 
+    "step": [
+        true
+    ], 
+    "x_bins": [
+        "30,-100,100"
+    ], 
+    "x_errors": [
+        false
+    ], 
+    "x_expressions": [
+        "LongZCorrectedRecoil_PerpZ"
+    ], 
+    "x_label": "$U_{\\perp} \\mathrm{[GeV]}$", 
+    "y_errors": [
+        false
+    ]
+}

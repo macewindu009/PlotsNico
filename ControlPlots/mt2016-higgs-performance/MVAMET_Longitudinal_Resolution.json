@@ -1,0 +1,16 @@
+{
+    "y_expressions": [
+		"recoMetOnGenMetProjectionPar",
+		"recoMetOnGenMetProjectionPar",
+		"recoPfMetOnGenMetProjectionPar",
+		"recoPfMetOnGenMetProjectionPar"
+    ], 
+    "y_label": "$E^{Gen} - E_{\\parallel}$",
+    "y_bins": [
+        "40,-50,70"
+    ], 
+    "y_lims": [
+        0, 
+        40.0
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "analysis_modules": [
+        "ProjectByFit"
+    ], 
+    "fit_backend": [
+        "ROOT"
+    ], 
+    "projection_function": [
+        "gaus"
+    ], 
+    "projection_parameters": [
+        "1000,10,10"
+    ], 
+    "projection_to_nick" : ["nick0", "nick1", "nick2", "nick3", "nick4", "nick5", "nick6" ],
+    "projection_to_plot": [
+        "2"
+    ]
+}

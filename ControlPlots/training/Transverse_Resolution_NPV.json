@@ -1,0 +1,28 @@
+{
+    "filename": "Transverse_Resolution_NPV", 
+	"y_lims" : [0,40],
+    "weights": [
+        "(select)&&nCombinations==1&&Boson_Pt>30", 
+         "z_pT>30"
+    ], 
+    "title" : "$p_T^Z > 30 \\mathrm{GeV}$",
+    "x_bins": [
+        "10,5,25"
+    ], 
+    "x_expressions": [
+        "NVertex", "nPV"
+    ], 
+    "x_label": "nPV", 
+    "y_bins": [
+        "50,-100,100"
+    ], 
+    "y_expressions": [
+        "recoilslimmedMETs_PerpZ",             "particleFlowUpdate_Uperp", 
+        "recoilpatpfTrackMET_PerpZ",        "trackUpdate_Uperp",
+        "recoilpatpfNoPUMET_PerpZ",         "noPileUpUpdate_Uperp",
+        "recoilpatpfPUMET_PerpZ",           "pileUpUpdate_Uperp",
+        "recoilslimmedMETsPuppi_PerpZ",     "0",
+        "recoilpatpfPUCorrectedMET_PerpZ",           "pileUpCorrectedUpdate_Uperp"
+    ], 
+    "y_label": "$U_{\\perp} $ Resolution [GeV]"
+}

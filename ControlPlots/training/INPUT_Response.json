@@ -1,0 +1,19 @@
+{
+    "tree_draw_options": [
+        "prof"
+    ], 
+    "y_expressions": [
+        "recoilslimmedMETs_LongZ/-Boson_Pt", 
+        "recoilpatpfMET_LongZ/-Boson_Pt", 
+        "recoilpatpfPUCorrectedMET_LongZ/-Boson_Pt", 
+        "recoilpatpfNoPUMET_LongZ/-Boson_Pt", 
+        "recoilpatpfTrackMET_LongZ/-Boson_Pt", 
+        "recoilpatpfPUMET_LongZ/-Boson_Pt", 
+        "recoilslimmedMETsPuppi_LongZ/-Boson_Pt"
+    ], 
+    "y_label": "$U_{\\parallel}/p_T^Z$", 
+    "y_lims": [
+        0, 
+        2.0
+    ]
+}

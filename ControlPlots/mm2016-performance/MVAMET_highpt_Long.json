@@ -1,0 +1,58 @@
+{
+    "analysis_modules": [
+        "FunctionPlot"
+    ], 
+    "colors": [
+        "orange", 
+        "goldenrod"
+    ], 
+    "filename": "MVAMET_highpt_Long", 
+    "files": [
+        "highpt.root", 
+        "highptwithlowpt.root"
+    ], 
+    "folders": [
+        "t"
+    ], 
+    "function_fit": [
+        "nick0", 
+        "nick1"
+    ], 
+    "function_parameters": [
+        "1000,1,1"
+    ], 
+    "function_ranges": [
+        "-150,150"
+    ], 
+    "functions": [
+        "gaus"
+    ], 
+    "labels": [
+        "MVA high-pt", 
+        "MVA"
+    ], 
+    "line_styles": [
+        "-"
+    ], 
+    "markers": [
+        ".", 
+        ""
+    ], 
+    "step": [
+        true
+    ], 
+    "x_bins": [
+        "30,-200,200"
+    ], 
+    "x_errors": [
+        false
+    ], 
+    "x_expressions": [
+        "LongZCorrectedRecoil_LongZ+Boson_Pt"
+    ], 
+    "x_label": "$U_{\\parallel} - p_T^Z \\mathrm{[GeV]}$", 
+    "y_errors": [
+        false
+    ],
+    "title": "$p_T^Z > 300 \\mathrm{GeV}$"
+}

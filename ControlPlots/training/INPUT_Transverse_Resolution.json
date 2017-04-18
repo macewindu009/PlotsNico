@@ -1,0 +1,19 @@
+{
+    "y_expressions": [
+        "recoilslimmedMETs_PerpZ", 
+        "recoilpatpfMET_PerpZ", 
+        "recoilpatpfPUCorrectedMET_PerpZ", 
+        "recoilpatpfNoPUMET_PerpZ", 
+        "recoilpatpfTrackMET_PerpZ", 
+        "recoilpatpfPUMET_PerpZ", 
+        "recoilslimmedMETsPuppi_PerpZ"
+    ], 
+    "y_label": "$< U_{\\perp} >$", 
+    "y_bins": [
+        "50,-100,100"
+    ], 
+    "y_lims": [
+        0, 
+        30.0
+    ]
+}

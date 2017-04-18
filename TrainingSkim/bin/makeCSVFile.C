@@ -31,33 +31,35 @@ bool isUsefulFile(float fileNr, vector<float> filesToInclude)
     for (unsigned int i = 0; i < filesToInclude.size(); i++)
         if (fileNr == filesToInclude[i])
 	    isUseful = true;
-	
+
     return isUseful;
-  
+
 }
 
 
 int main(int argc, char* argv[] )
 {
 	cout << "Loading Rootfile.." << endl;
-	
+
 	std::string filename1 = argv[1];
 	TFile *inputFile1 = TFile::Open(filename1.c_str());
 	TTree *inputTree1 = (TTree*)(inputFile1->Get("t"));
-	
+
 	std::string outputfile = "";
-        
+
 	if (argc > 2)
 	    outputfile = argv[2];
 	else
 	    outputfile = "DataForNNTraining.csv";
-        
+
 	cout << "Outputfile: " <<outputfile << endl;
-	
+
 	fstream dataset;
 	dataset.open(outputfile.c_str(), ios::out);
-	
-	
+
+
+	//define if to filter on filename
+	bool applyFilter = false;
 	vector<float> fileList = {};
 	if (argc > 3)
 	{
@@ -68,59 +70,66 @@ int main(int argc, char* argv[] )
 		fileList.push_back(atoi(argv[i]));
 	    }
 	    cout << endl;
+	    applyFilter = true;
 	}
 	else
 	{
-	    cout << "No files specified, using Dataset DYJetsToLL_M-50_TuneCUETP8M1_13TeV-madgraphMLM-pythia8 as default";
-	    fileList.push_back(1);
+	    cout << "No files specified, not applying any cut on data.";
+
+	    //fileList.push_back(1);
 	}
-	
+
 	cout << "Total Number of Files to include: " << fileList.size() << endl;
-	
+
 	cout << "Entries: " << inputTree1->GetEntries() << endl;
 
-	
-	TObjArray *entryarray = new TObjArray(*inputTree1->GetListOfBranches());
-	
-	
 
-	cout << "Number of objects = " << entryarray->GetEntries() << endl; 
-	
-	
-	
+	TObjArray *entryarray = new TObjArray(*inputTree1->GetListOfBranches());
+
+
+
+	cout << "Number of objects = " << entryarray->GetEntries() << endl;
+
+
+
 	cout << "Counting selected events..." << endl;
 
 	int selectedEvents = 0;
 	float fileChecker;
-	inputTree1->SetBranchAddress("fileName",&fileChecker);
+	if (applyFilter)
+	    inputTree1->SetBranchAddress("fileName",&fileChecker);
 	for (int i = 0; i < inputTree1->GetEntries(); i++)
 	{
 	    inputTree1 -> GetEntry(i);
-	    if (isUsefulFile(fileChecker, fileList))
+	    if (!applyFilter)
 		selectedEvents++;
+	    else
+		if (isUsefulFile(fileChecker, fileList))
+		    selectedEvents++;
+
 	    if (i % 1000000 == 0)
 		cout << i <<  "/" << inputTree1->GetEntries() << " Events processed" << endl;
 	}
-	
-	
+
+
 	int maxEntries = 0;
 	bool limitEvents = false;
 	if (limitEvents)
 	  if (selectedEvents > 500000)
 	      maxEntries = 500000;
-	  else 
+	  else
 	      maxEntries = selectedEvents;
 	else
 	  maxEntries = selectedEvents;
 
-	cout << "SelectedEvents: " << selectedEvents << endl;
-	
+	cout << "Selected events: " << selectedEvents << endl;
+
 	int variablesize = entryarray->GetEntries();
-	
+
 	cout << "maxEntries: " << maxEntries << endl;
 	cout << "variablesize: " << variablesize << endl;
 	float *datacontainer = new float[maxEntries*(variablesize)];
-	
+
 	cout << "Loading data into local storage.." << endl;
 	int fileID = 0;
 	//variablesize - 5 as it does not store the additional 5 calculated target variables
@@ -128,39 +137,40 @@ int main(int argc, char* argv[] )
 	for (int j = 0; j < entryarray->GetEntries(); j++)
 	    {
 		inputTree1->SetBranchAddress(entryarray->At(j)->GetName(),&varlist[j]);
-		if (strcmp(entryarray->At(j)->GetName(),"fileName") == 0)
-                    fileID = j;
+		if (applyFilter)
+		    if (strcmp(entryarray->At(j)->GetName(),"fileName") == 0)
+			fileID = j;
 
 	    }
-	cout << "fileID: " << fileID << endl;
 	int count = 0;
 	int treecount = 0;
 
 	while (count < maxEntries && treecount < inputTree1->GetEntries())
 	{
 	    inputTree1 -> GetEntry(treecount);
-
-	    if (isUsefulFile(varlist[fileID],fileList))
+	    if (!applyFilter)
 	    {
 		for (int j = 0; j < variablesize; j++)
-		{
-		    
-		    {
-			datacontainer[count*(variablesize)+j] = varlist[j];	
-		    }
-		}
+		    datacontainer[count*(variablesize)+j] = varlist[j];
 		count++;
 	    }
+	    else
+		if (isUsefulFile(varlist[fileID],fileList))
+		{
+		    for (int j = 0; j < variablesize; j++)
+			datacontainer[count*(variablesize)+j] = varlist[j];
+		    count++;
+		}
 	    treecount++;
 	    if (treecount % 1000000 == 0)
-		cout << treecount << "/" << inputTree1->GetEntries() << " Events processed" << endl;
-	}	
+		cout << treecount << "/" << inputTree1->GetEntries() << " events processed" << endl;
+	}
 	maxEntries = count;
 	cout << "CSV Entries: " << count << endl;
-	cout << variablesize << endl;	
+	cout << variablesize << endl;
 	float mean[variablesize];
 	float variance[variablesize];
-	
+
 	for (int j = 0; j < variablesize; j++)
 	{
 	    mean[j] = 0;
@@ -168,7 +178,7 @@ int main(int argc, char* argv[] )
 	    for (int i = 0; i < maxEntries; i++)
 		mean[j] += datacontainer[i*(variablesize)+j];
 	    mean[j] /= maxEntries;
-	    
+
 	    for (int i = 0; i < maxEntries; i++)
 		variance[j] += (datacontainer[i*(variablesize)+j] - mean[j])*(datacontainer[i*(variablesize)+j] - mean[j]);
 	    variance[j] /= maxEntries;
@@ -179,15 +189,13 @@ int main(int argc, char* argv[] )
 	int recoilslimmedMETs_Phi = 0;
 	int recoilslimmedMETs_LongZ = 0;
 	int PhiCorrectedRecoil_LongZ = 0;
-	
+
 	for (int i = 0; i < entryarray->GetEntries(); i++)
 	{
-	    cout << "." << endl;
 	    //search for needed variables for target variable
 	    if (strcmp(entryarray->At(i)->GetName(),"recoilslimmedMETs_Phi") == 0)
 		recoilslimmedMETs_Phi = i;
 
-	    cout << "." << endl;
 	    if (strcmp(entryarray->At(i)->GetName(),"recoilslimmedMETs_LongZ") == 0)
 		recoilslimmedMETs_LongZ = i;
 	    if (strcmp(entryarray->At(i)->GetName(),"Boson_Phi") == 0)
@@ -212,36 +220,36 @@ int main(int argc, char* argv[] )
 			dataset << ",";
 	    }
 	}
-		
+
 	cout << "boson_Phi " << boson_Phi<<endl;
 	cout << "boson_Pt " << boson_Pt<<endl;
 	cout << "recoilslimmedMETs_Phi " << recoilslimmedMETs_Phi<<endl;
 	cout << "recoilslimmedMETs_LongZ " << recoilslimmedMETs_LongZ<<endl;
 	cout << "PhiCorrectedRecoil_LongZ " << PhiCorrectedRecoil_LongZ<<endl;
-	
+
 	//add target variables
 	dataset << endl;
-	
+
 	cout << "Processing data, generating csv-File.." << endl;
 	for (int i = 0; i < maxEntries; i++)
 	{
 	    for (int j = 0; j < entryarray->GetEntries()-1; j++)
 		if (variance[j] != 0)
 		    dataset << datacontainer[i*(variablesize)+j] << ",";
-	    
+
 	    if (variance[entryarray->GetEntries()-1] != 0)
 	        dataset << datacontainer[i*variablesize + entryarray->GetEntries()-1];
-	    
+
 	    if (i != (inputTree1->GetEntries()-1))
 	    {
 		dataset << endl;
 	    }
-	    
+
 	    if (i % 100000 == 0)
 		cout << i <<  "/" << maxEntries << " Events processed" << endl;
 	}
-	
-	cout << "Succesfully created csv File!" << endl;	
+
+	cout << "Succesfully created csv File!" << endl;
 	dataset.close();
 	return 0;
 }

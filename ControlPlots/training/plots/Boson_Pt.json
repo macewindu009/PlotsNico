@@ -1,0 +1,82 @@
+{
+    "colors": [
+        "black", 
+        "navy", 
+        "blue", 
+        "royalblue", 
+        "tomato"
+    ], 
+    "files": [
+        "DY.root", 
+        "DY200to400slimmed.root", 
+        "DY400to600slimmed.root", 
+        "DY600ToInfslimmed.root", 
+        "All.root"
+    ], 
+    "folders": [
+        "MAPAnalyzer/t", 
+        "t", 
+        "t", 
+        "t", 
+        "t"
+    ], 
+    "friend_filenames": [
+        "", 
+        "", 
+        "", 
+        "", 
+        "flatPtWeight.root"
+    ], 
+    "friend_treenames": [
+        "", 
+        "", 
+        "", 
+        "", 
+        "flatPtWeight"
+    ], 
+    "labels": [
+        "DY inclusive", 
+        "DY HT ($200 \\rightarrow 400 GeV$)", 
+        "DY HT ($400 \\rightarrow 400 GeV$)", 
+        "DY HT (more than $600 GeV$)", 
+        "weighted combination"
+    ], 
+    "line_styles": [
+        "-", 
+        "-", 
+        "-", 
+        "-", 
+        "--"
+    ], 
+    "markers": [
+        "", 
+        "", 
+        "", 
+        "", 
+        ""
+    ], 
+    "step": [
+        true
+    ], 
+    "weights": [
+        "1", 
+        "1", 
+        "1", 
+        "1", 
+        "flatPtWeight*select"
+    ], 
+    "x_bins": [
+        "80,0,800"
+    ], 
+    "x_errors": [
+        false
+    ], 
+    "x_expressions": [
+        "Boson_Pt"
+    ], 
+    "x_label": "$p_T^Z (\\mathrm{GeV}) $", 
+    "y_errors": [
+        false
+    ], 
+    "y_log": true
+}
