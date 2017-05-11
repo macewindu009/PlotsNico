@@ -3,6 +3,7 @@
 		"inputFile": "/storage/jbod/nzaeh/2016-12-13/Gridoutput/merged/mm_Dataslimmed.csv",
 		"outputDir": "../plots/",
 		"fixedRange": false,
+		"studyVars": false,
 		"plottingdefault":
 		{
 			"plotPlotVariables": true,
@@ -19,7 +20,9 @@
                         "recoMetOnGenMetProjectionPar","recoMetOnGenMetProjectionPerp","recoMetOnGenMetProjectionPhi",
                         "recoPfMetOnGenMetProjectionPar","recoPfMetOnGenMetProjectionPerp","recoPfMetOnGenMetProjectionPhi",
                         "genMetSumEt","genMet_Pt","genMet_Phi",
-                        "npu"
+                        "npu",
+						"eventWeight",
+						"probChiSquare", "probChiSquarePf"
 			],
 			"inputVariables":
 			[
@@ -52,9 +55,10 @@
 			"plotBDTPerformance": true,
 			"plotPuppiPerformance": false,
 			"plotPhiCorrected": false,
-			"plotAdditionalBDTPlots": true,
+			"plotAdditionalBDTPlots": false,
 			"plotAdditionalCustomPlots": true,
 			"plotJetStudyPlots": false,
+			"plotAlphaMethod": false,
 			"lowerAlphaCut": 0.2,
 			"upperAlphaCut": 0.8
 		}

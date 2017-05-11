@@ -1,0 +1,16 @@
+{
+    "x_bins": [
+        "0 1 2 3 4 5 6"
+    ], 
+    "x_expressions": [
+        "njetspt30"
+    ], 
+    "x_label": "nJets",
+    "weights": [
+        "eventWeight*(nbtag == 0)*(extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(againstMuonTight3_2 > 0.5)*(dilepton_veto < 0.5)*(againstElectronVLooseMVA6_2 > 0.5)*((q_1*q_2)<0.0)"
+    ],
+    "texts" : "with $p_T^{Jet} > 30 \\mathrm{GeV}$",
+    "texts_size" : "30", 
+    "texts_x" : "0.25",
+    "texts_y" : "0.2"
+}

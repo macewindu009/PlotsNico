@@ -1,0 +1,14 @@
+{
+    "y_expressions": [
+		"recoMetOnGenMetProjectionPar",
+		"recoPfMetOnGenMetProjectionPar"
+    ], 
+    "y_label": "$U_{\\parallel}^{MVA}/p_t^{Z,Gen}$",
+    "y_bins": [
+        "40,-50,70"
+    ], 
+    "y_lims": [
+        0, 
+        30.0
+    ]
+}

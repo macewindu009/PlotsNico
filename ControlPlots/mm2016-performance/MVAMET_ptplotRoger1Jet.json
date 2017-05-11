@@ -1,0 +1,21 @@
+{
+    "x_bins": [
+        "0 10 20 30 60 100"
+    ], 
+    "x_expressions": [
+        "ptvis"
+    ], 
+    "weights": [
+        "(njetspt30==1)*(1.0)*(((1.0)))*eventWeight*(((genbosonmass >= 50.0 && (npartons == 0 || npartons >= 5))*3.95423374e-5) + ((genbosonmass >= 50.0 && npartons == 1)*1.27486147e-5) + ((genbosonmass >= 50.0 && npartons == 2)*1.3012785e-5) + ((genbosonmass >= 50.0 && npartons == 3)*1.33802133e-5) + ((genbosonmass >= 50.0 && npartons == 4)*1.09698723e-5)+((genbosonmass < 50.0)*numberGeneratedEventsWeight*crossSectionPerEventWeight))/(numberGeneratedEventsWeight*crossSectionPerEventWeight*sampleStitchingWeight)*(gen_match_1 < 4 || gen_match_2 < 4)*(extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(m_vis > 60.0)*(m_vis < 120.0)*(iso_2 < 0.15)*(iso_1 < 0.15)*((q_1*q_2)<0.0)*zPtReweightWeight", 
+        "(njetspt30==1)*((1.0))*((((1.0))))*(eventWeight)*((extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(m_vis > 60.0)*(m_vis < 120.0)*(iso_2 < 0.15)*(iso_1 < 0.15)*((q_1*q_2)<0.0))*(topPtReweightWeight)", 
+        "(njetspt30==1)*(1.0)*(((1.0)))*eventWeight*(extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(m_vis > 60.0)*(m_vis < 120.0)*(iso_2 < 0.15)*(iso_1 < 0.15)*((q_1*q_2)<0.0)", 
+        "(njetspt30==1)*((1.0)*(1.0))*((((1.0))))*(eventWeight)*((extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(m_vis > 60.0)*(m_vis < 120.0)*(iso_2 < 0.15)*(iso_1 < 0.15)*((q_1*q_2)<0.0))"
+    ],
+    "x_label": "$p_T^Z$",
+	"x_lims": [
+	0.0,
+	100.0
+	]
+
+
+}

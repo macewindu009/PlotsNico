@@ -1,0 +1,16 @@
+{
+    "x_bins": [
+        "0 1 2 3 4 5 6"
+    ], 
+    "x_expressions": [
+        "njetspt30"
+    ], 
+    "x_label": "nJets",
+    "weights": [
+        "(1.0)*(1.0)*(1.0)*(1.0)*(((1.0)*(1.0)))*eventWeight*(((npartons == 0 || npartons >= 5)*7.09390278348407e-4) + ((npartons == 1)*1.90063898596475e-4) + ((npartons == 2)*5.8529964471165e-5) + ((npartons == 3)*1.9206444928444e-5) + ((npartons == 4)*1.923548021385e-5))/(numberGeneratedEventsWeight*crossSectionPerEventWeight*sampleStitchingWeight)*(nbtag == 0)*(extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(againstMuonTight3_2 > 0.5)*(dilepton_veto < 0.5)*(againstElectronVLooseMVA6_2 > 0.5)*(mt_1<40.0)*(byTightIsolationMVArun2v1DBoldDMwLT_2 > 0.5)*(iso_1 < 0.15)*((q_1*q_2)<0.0)"
+    ],
+    "texts" : "with $p_T^{Jet} > 30 \\mathrm{GeV}$",
+    "texts_size" : "30", 
+    "texts_x" : "0.25",
+    "texts_y" : "0.2"
+}

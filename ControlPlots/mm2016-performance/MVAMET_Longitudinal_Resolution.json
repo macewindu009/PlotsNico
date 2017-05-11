@@ -1,20 +1,20 @@
 {
     "y_expressions": [
-        "recoMetPar",
-        "recoMetPar",
-        "recoMetPar",
-        "recoMetPar",
-        "recoPfMetPar",
-        "recoPfMetPar",
-        "recoPfMetPar",
-        "recoPfMetPar"
+        "recoilPar+ptvis",
+        "recoilPar+ptvis",
+        "recoilPar+ptvis",
+        "recoilPar+ptvis",
+        "pfrecoilPar+ptvis",
+        "pfrecoilPar+ptvis",
+        "pfrecoilPar+ptvis",
+        "pfrecoilPar+ptvis"
     ], 
-    "y_label": "$U_{\\parallel}/p_T^Z$", 
+    "y_label": "$\\sigma(U_{\\parallel}+p_T^Z)$", 
     "y_bins": [
         "50,-100,100"
     ], 
     "y_lims": [
-        0, 
-        30.0
+		0.0,
+       30.0
     ]
 }

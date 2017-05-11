@@ -9,13 +9,11 @@
         "gaus"
     ], 
     "projection_parameters": [
-        "1000,0,15"
+        "1000,10,10"
     ], 
     "projection_to_nick" : [
         "mva_mc", 
-        "mva_data", 
-        "pf_mc", 
-        "pf_data"
+        "pf_mc"
     ], 
     "projection_to_plot": [
         "2"

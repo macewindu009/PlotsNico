@@ -1,0 +1,96 @@
+{
+    "analysis_modules": [
+        "ProjectByFit"
+    ], 
+    "colors": [
+        "goldenrod", 
+        "black"
+    ], 
+    "directories": [
+        "/storage/jbod/nzaeh/ArtusRun3003NafMVA/merged/"
+    ], 
+    "energies": [
+        13
+    ], 
+    "filename": "dy_Transverse_resolution_pt", 
+    "files": [
+        "DY1JetsToLLM50_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8/*.root DY3JetsToLLM50_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8/*.root DY4JetsToLLM50_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8/*.root DY2JetsToLLM50_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8/*.root DYJetsToLLM10to50_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8/*.root DYJetsToLLM50_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8_ext1/*.root DYJetsToLLM50_RunIISummer16MiniAODv2_PUMoriond17_13TeV_MINIAOD_madgraph-pythia8_ext2/*.root"
+    ], 
+    "fit_backend": [
+        "ROOT"
+    ], 
+    "folders": [
+        "mt_jecUncNom/ntuple"
+    ], 
+    "grid": true, 
+    "labels": [
+        "MVA (sim.)", 
+        "PF (sim.)"
+    ], 
+    "legend_cols": 2, 
+    "line_styles": [
+        "-", 
+        "-"
+    ], 
+    "lumis": [
+        12.9
+    ], 
+    "markers": [
+        "", 
+        ""
+    ], 
+    "nicks": [
+        "mva_mc", 
+        "pf_mc"
+    ], 
+    "nicks_blacklist": [
+        "noplot"
+    ], 
+    "output_dir": "./", 
+    "projection_function": [
+        "gaus"
+    ], 
+    "projection_parameters": [
+        "1000,10,10"
+    ], 
+    "projection_to_nick": [
+        "mva_mc", 
+        "pf_mc"
+    ], 
+    "projection_to_plot": [
+        "2"
+    ], 
+    "scale_factors": [
+        12900.0
+    ], 
+    "step": true, 
+    "title": "$DY$", 
+    "weights": [
+        "(gen_match_2 == 5)*((((1.0))))*(eventWeight)*((((genbosonmass >= 150.0 && (npartons == 0 || npartons >= 5))*3.95423374e-5) + ((genbosonmass >= 150.0 && npartons == 1)*1.27486147e-5) + ((genbosonmass >= 150.0 && npartons == 2)*1.3012785e-5) + ((genbosonmass >= 150.0 && npartons == 3)*1.33802133e-5) + ((genbosonmass >= 150.0 && npartons == 4)*1.09698723e-5)+((genbosonmass >= 50.0 && genbosonmass < 150.0 && (npartons == 0 || npartons >= 5))*3.95423374e-5) + ((genbosonmass >= 50.0 && genbosonmass < 150.0 && npartons == 1)*1.27486147e-5) + ((genbosonmass >= 50.0 && genbosonmass < 150.0 && npartons == 2)*1.3012785e-5) + ((genbosonmass >= 50.0 && genbosonmass < 150.0 && npartons == 3)*1.33802133e-5) + ((genbosonmass >= 50.0 && genbosonmass < 150.0 && npartons == 4)*1.09698723e-5)+((genbosonmass < 50.0)*numberGeneratedEventsWeight*crossSectionPerEventWeight))/(numberGeneratedEventsWeight*crossSectionPerEventWeight*sampleStitchingWeight))*((0.95))*(extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(againstMuonTight3_2 > 0.5)*(dilepton_veto < 0.5)*(againstElectronVLooseMVA6_2 > 0.5)*(mt_1<50.0)*(byTightIsolationMVArun2v1DBoldDMwLT_2 > 0.5)*(iso_1 < 0.15)*((q_1*q_2)<0.0)*zPtReweightWeight"
+    ], 
+    "x_bins": [
+        "5 25 45 65 85 105"
+    ], 
+    "x_errors": [
+        false
+    ], 
+    "x_expressions": [
+        "ptvis"
+    ], 
+    "x_label": "$p_T^Z$", 
+    "y_bins": [
+        "50,-100,100"
+    ], 
+    "y_errors": [
+        false
+    ], 
+    "y_expressions": [
+        "recoMetOnGenMetProjectionPerp", 
+        "recoPfMetOnGenMetProjectionPerp"
+    ], 
+    "y_label": "$E_{\\perp}^{MVA}$", 
+    "y_lims": [
+        0, 
+        30.0
+    ]
+}

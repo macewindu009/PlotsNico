@@ -1,20 +1,20 @@
 {
     "y_expressions": [
-        "recoMetPerp",
-        "recoMetPerp",
-        "recoMetPerp",
-        "recoMetPerp",
-        "recoPfMetPerp",
-        "recoPfMetPerp",
-        "recoPfMetPerp",
-        "recoPfMetPerp"
+        "recoilPerp",
+        "recoilPerp",
+        "recoilPerp",
+        "recoilPerp",
+        "pfrecoilPerp",
+        "pfrecoilPerp",
+        "pfrecoilPerp",
+        "pfrecoilPerp"
     ], 
-    "y_label": "$U_{\\perp}/p_T^Z$", 
+    "y_label": "$\\sigma(U_{\\perp})$", 
     "y_bins": [
         "50,-100,100"
     ], 
     "y_lims": [
-        0, 
+        0.0,
         30.0
     ]
 }
