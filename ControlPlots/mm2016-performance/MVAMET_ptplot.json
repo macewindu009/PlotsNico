@@ -11,7 +11,7 @@
         "(1.0)*(((1.0)))*eventWeight*(extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(m_vis > 60.0)*(m_vis < 120.0)*(iso_2 < 0.15)*(iso_1 < 0.15)*((q_1*q_2)<0.0)", 
         "((1.0)*(1.0))*((((1.0))))*(eventWeight)*((extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(m_vis > 60.0)*(m_vis < 120.0)*(iso_2 < 0.15)*(iso_1 < 0.15)*((q_1*q_2)<0.0))"
     ],
-    "x_label": "$p_T^Z$"
+    "x_label": "$p_T^Z$ in GeV"
 
 
 }

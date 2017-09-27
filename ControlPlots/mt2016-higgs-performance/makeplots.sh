@@ -1,5 +1,5 @@
-inputdir=/storage/jbod/nzaeh/ArtusRun3003NafMVA/merged/
-outputdir=/home/nzaeh/MVAPlots/Plots/HiggsPerformance/
+inputdir=/storage/jbod/nzaeh/NAFOwnCorr2605/merged/
+outputdir=/home/nzaeh/MVAPlots/Plots/HiggsPerformanceOwnCorr/
 
 
 # MVA MET plots

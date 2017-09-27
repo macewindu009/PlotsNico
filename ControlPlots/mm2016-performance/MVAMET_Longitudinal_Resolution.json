@@ -9,7 +9,7 @@
         "pfrecoilPar+ptvis",
         "pfrecoilPar+ptvis"
     ], 
-    "y_label": "$\\sigma(U_{\\parallel}+p_T^Z)$", 
+    "y_label": "$\\sigma(U_{\\parallel}+p_T^Z)$ in GeV", 
     "y_bins": [
         "50,-100,100"
     ], 

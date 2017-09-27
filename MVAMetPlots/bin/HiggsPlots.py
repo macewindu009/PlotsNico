@@ -128,7 +128,7 @@ def get_weightedStdErr(data, dictPlot, method = 'Trunc'):
 def get_Quantity(data, dictPlot, quantity, method = 'Trunc'):
 	#check if dataset contains datapoints
 	if data.shape[0] == 0:
-		return 1.01
+		return 0.01
 	#Empiric mean over the whole data sample
 	if method == 'Empiric':
 		#Mean calculation
@@ -280,15 +280,15 @@ def alphaFit(dictPlot, alphaDataIn, bosonName='recoilslimmedMETs_Pt', mode='Resp
 		plt.plot(XRange,YMean,'o')
 		y = linear(XRange,*coeffMean)
 		plt.plot(XRange,y)
-		plt.ylabel(r'$<U_{\|\|} / p_T^Z>$'' in GeV',fontsize = 20)
+		plt.ylabel(r'$<U_{\|\|} / p_T^H>$'' in GeV',fontsize = 20)
 		plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.30*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$\mathrm{Events\,per\,Fit} = %i$''\n'r'$y = a \cdot x + b$''\n'r'$\mathrm{a} = %.2f$''\n'r'$\mathrm{b} = %.2f$''\n'%(alphaData.shape[0]/10,coeffMean[0], coeffMean[1]),color = 'k',fontsize=16)
 	elif mode == 'Resolution':
 		plt.plot(XRange,YStd,'o')
 		y = linear(XRange,*coeffStd)
 		plt.plot(XRange,y)
-		plt.ylabel(r'$\sigma(<U_{\|\|} - p_T^Z>)$'' in GeV',fontsize = 20)
+		plt.ylabel(r'$\sigma(<U_{\|\|} - p_T^H>)$'' in GeV',fontsize = 20)
 		plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.30*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$\mathrm{Events\,per\,Fit} = %i$''\n'r'$y = a \cdot x + b$''\n'r'$\mathrm{a} = %.2f$''\n'r'$\mathrm{b} = %.2f$''\n'%(alphaData.shape[0]/10,coeffStd[0], coeffStd[1]),color = 'k',fontsize=16)
-	plt.xlabel(r'$\alpha = p_{t}^{Jet1}/p_T^Z}$',fontsize = 20)
+	plt.xlabel(r'$\alpha = p_{t}^{Jet1}/p_T^H}$',fontsize = 20)
 	#if not saveName == 'dummy.pdf':
 		#plt.savefig(saveName)
 	plt.clf()
@@ -370,20 +370,20 @@ def add_MetProjections(config, inputDataPlot, dictPlot):
 	if 'LongZCorrectedRecoil_MET' in dictPlot and 'LongZCorrectedRecoil_METPhi' in dictPlot and 'genMet_Pt' in dictPlot and 'genMet_Phi' in dictPlot:
 		if not 'recoMetOnGenMetProjectionPar' in dictPlot:
 			dictPlot['recoMetOnGenMetProjectionPar'] = inputDataPlot.shape[1]
-			inputDataPlot = np.hstack((inputDataPlot, np.array(-np.cos(inputDataPlot[:,dictPlot['genMet_Phi']]-inputDataPlot[:,dictPlot['LongZCorrectedRecoil_METPhi']])*(inputDataPlot[:,dictPlot['LongZCorrectedRecoil_MET']])).reshape(inputDataPlot.shape[0],1)))
+			inputDataPlot = np.hstack((inputDataPlot, np.array(np.cos(inputDataPlot[:,dictPlot['genMet_Phi']]-inputDataPlot[:,dictPlot['LongZCorrectedRecoil_METPhi']])*(inputDataPlot[:,dictPlot['LongZCorrectedRecoil_MET']])).reshape(inputDataPlot.shape[0],1)))
 		if not 'recoMetOnGenMetProjectionPerp' in dictPlot:
 			dictPlot['recoMetOnGenMetProjectionPerp'] = inputDataPlot.shape[1]
-			inputDataPlot = np.hstack((inputDataPlot, np.array(-np.sin(inputDataPlot[:,dictPlot['genMet_Phi']]-inputDataPlot[:,dictPlot['LongZCorrectedRecoil_METPhi']])*(inputDataPlot[:,dictPlot['LongZCorrectedRecoil_MET']])).reshape(inputDataPlot.shape[0],1)))
+			inputDataPlot = np.hstack((inputDataPlot, np.array(np.sin(inputDataPlot[:,dictPlot['genMet_Phi']]-inputDataPlot[:,dictPlot['LongZCorrectedRecoil_METPhi']])*(inputDataPlot[:,dictPlot['LongZCorrectedRecoil_MET']])).reshape(inputDataPlot.shape[0],1)))
 
 	#Also for additional datasets
 	for index in range(len(config['inputFile'])-1):
 		if 'V%iLongZCorrectedRecoil_MET'%index in dictPlot and 'V%iLongZCorrectedRecoil_METPhi'%index in dictPlot and 'genMet_Pt' in dictPlot and 'genMet_Phi' in dictPlot:
 			if not 'V%irecoMetOnGenMetProjectionPar'%index in dictPlot:
 				dictPlot['V%irecoMetOnGenMetProjectionPar'%index] = inputDataPlot.shape[1]
-				inputDataPlot = np.hstack((inputDataPlot, np.array(-np.cos(inputDataPlot[:,dictPlot['genMet_Phi']]-inputDataPlot[:,dictPlot['V%iLongZCorrectedRecoil_METPhi'%index]])*(inputDataPlot[:,dictPlot['V%iLongZCorrectedRecoil_MET'%index]])).reshape(inputDataPlot.shape[0],1)))
+				inputDataPlot = np.hstack((inputDataPlot, np.array(np.cos(inputDataPlot[:,dictPlot['genMet_Phi']]-inputDataPlot[:,dictPlot['V%iLongZCorrectedRecoil_METPhi'%index]])*(inputDataPlot[:,dictPlot['V%iLongZCorrectedRecoil_MET'%index]])).reshape(inputDataPlot.shape[0],1)))
 			if not 'V%irecoMetOnGenMetProjectionPerp'%index in dictPlot:
 				dictPlot['V%irecoMetOnGenMetProjectionPerp'%index] = inputDataPlot.shape[1]
-				inputDataPlot = np.hstack((inputDataPlot, np.array(-np.sin(inputDataPlot[:,dictPlot['genMet_Phi']]-inputDataPlot[:,dictPlot['V%iLongZCorrectedRecoil_METPhi'%index]])*(inputDataPlot[:,dictPlot['V%iLongZCorrectedRecoil_MET'%index]])).reshape(inputDataPlot.shape[0],1)))
+				inputDataPlot = np.hstack((inputDataPlot, np.array(np.sin(inputDataPlot[:,dictPlot['genMet_Phi']]-inputDataPlot[:,dictPlot['V%iLongZCorrectedRecoil_METPhi'%index]])*(inputDataPlot[:,dictPlot['V%iLongZCorrectedRecoil_MET'%index]])).reshape(inputDataPlot.shape[0],1)))
 
 	#Also for PF
 	if 'dpfmet_Pt' in dictPlot and 'dpfmet_Phi' in dictPlot and 'genMet_Pt' in dictPlot:
@@ -549,14 +549,6 @@ def load_datasetcsv(config):
 	if 'LongZCorrectedRecoil_LongZ' in dictPlot:
 		countFirst = inputDataPlot.shape[0]
 		inputDataPlot = inputDataPlot[500>inputDataPlot[:,dictPlot['LongZCorrectedRecoil_LongZ']],:]
-		inputDataPlot = inputDataPlot[-500<inputDataPlot[:,dictPlot['LongZCorrectedRecoil_LongZ']],:]
-		inputDataPlot = inputDataPlot[np.invert(np.isnan(inputDataPlot[:,dictPlot['LongZCorrectedRecoil_LongZ']])),:]
-		inputDataPlot = inputDataPlot[500>inputDataPlot[:,dictPlot['recoMetOnGenMetProjectionPar']],:]
-		inputDataPlot = inputDataPlot[-500<inputDataPlot[:,dictPlot['recoMetOnGenMetProjectionPar']],:]
-		inputDataPlot = inputDataPlot[np.invert(np.isnan(inputDataPlot[:,dictPlot['recoMetOnGenMetProjectionPar']])),:]
-		inputDataPlot = inputDataPlot[500>inputDataPlot[:,dictPlot['recoMetOnGenMetProjectionPerp']],:]
-		inputDataPlot = inputDataPlot[-500<inputDataPlot[:,dictPlot['recoMetOnGenMetProjectionPerp']],:]
-		inputDataPlot = inputDataPlot[np.invert(np.isnan(inputDataPlot[:,dictPlot['recoMetOnGenMetProjectionPerp']])),:]
 		if (countFirst - inputDataPlot.shape[0]) > 0:
 			print(r'Deleted %i events exceeding a threshold of MVA recoil > 500 GeV'%(countFirst-inputDataPlot.shape[0]))
 
@@ -600,7 +592,7 @@ def make_Plot(variablename, inputData, dictPlot, outputdir):
 	return 0
 
 
-def make_ResponseCorrectedPlot(config, XRange, YStd, YResponse, bosonName, targetvariable,	minrange,maxrange, stepwidth, ptmin,ptmax, labelname = 'MVA Met', relateVar = 'p_T^Z', relateUnits = 'GeV'):
+def make_ResponseCorrectedPlot(config, XRange, YStd, YResponse, bosonName, targetvariable,	minrange,maxrange, stepwidth, ptmin,ptmax, labelname = 'MVA Met', relateVar = 'p_T^H', relateUnits = 'GeV'):
 
 	plt.clf()
 	ResCorr = YStd[:]/YResponse[:]
@@ -626,7 +618,7 @@ def make_ResponseCorrectedPlot(config, XRange, YStd, YResponse, bosonName, targe
 
 	return
 
-def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable,	minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^Z', relateUnits = 'GeV', binRanges = np.array([42])):
+def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable,	minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^H', relateUnits = 'GeV', binRanges = np.array([42])):
 
 
 	if binRanges[0] == 42:
@@ -689,8 +681,8 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable,	min
 
 			YStdErr[index] = get_weightedStdErr(currentDistri, dictPlot, config['method'][0])
 
-			#plt.xlabel(r'$U_{||} - p_T^Z$ at $%s = (%i - %i)\,\mathrm{%s}$'%(relateVar,XRange[index],XRange[index+1],relateUnits),fontsize = 20)
-			plt.xlabel(r'$(U_{||} - p_T^Z)\ \mathrm{in\ GeV}$',fontsize = 22)
+			#plt.xlabel(r'$U_{||} - p_T^H$ at $%s = (%i - %i)\,\mathrm{%s}$'%(relateVar,XRange[index],XRange[index+1],relateUnits),fontsize = 20)
+			plt.xlabel(r'$(U_{||} - p_T^H)\ \mathrm{in\ GeV}$',fontsize = 22)
 			plt.text(0.04*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.9*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$(%i < %s < %i)\,\mathrm{%s}$'%(XRange[index],relateVar, XRange[index+1],relateUnits),color = 'k',fontsize=16, weight='bold', bbox=dict(facecolor='white', edgecolor='black', pad=10.0))
 			plt.title(r'$\mathrm{Resolution}\ U_{||}\ - \ $ %s'%labelname[:-13]+'$', fontsize = 28, y = 1.02)
 			if ptmax == 0:
@@ -742,7 +734,7 @@ def make_ResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable,	min
 	return XRange, YStd
 
 
-def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^Z', relateUnits = 'GeV', binRanges = np.array([42])):
+def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^H', relateUnits = 'GeV', binRanges = np.array([42])):
 
 
 	#XRange = np.arange(plotData[:,targetindex].min(),plotData[:,targetindex].max(),(plotData[:,targetindex].max()-plotData[:,targetindex].min())/nbins)
@@ -844,7 +836,7 @@ def make_METResolutionPlot(config,plotData,dictPlot, bosonName, targetvariable, 
 
 	return 0
 
-def make_METResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^Z', relateUnits = 'GeV', binRanges = np.array([42])):
+def make_METResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^H', relateUnits = 'GeV', binRanges = np.array([42])):
 
 
 	#XRange = np.arange(plotData[:,targetindex].min(),plotData[:,targetindex].max(),(plotData[:,targetindex].max()-plotData[:,targetindex].min())/nbins)
@@ -947,7 +939,7 @@ def make_METResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariab
 
 
 
-def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^Z', relateUnits = 'GeV', binRanges = np.array([42])):
+def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^H', relateUnits = 'GeV', binRanges = np.array([42])):
 
 	if binRanges[0] == 42:
 		if minrange == 42:
@@ -1008,7 +1000,7 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  min
 			YStdErr[index] = get_weightedStdErr(currentDistri, dictPlot, config['method'][0])
 			if config['studyVars']:
 				quantityComparison(config, currentDistri, dictPlot, AlternativeDistri, bosonName)
-			plt.xlabel(r'$U_{||} / -p_T^Z$',fontsize = 22)
+			plt.xlabel(r'$U_{||} / -p_T^H$',fontsize = 22)
 			plt.text(0.04*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.9*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$(%i < %s < %i)\,\mathrm{%s}$'%(XRange[index],relateVar, XRange[index+1],relateUnits),color = 'k',fontsize=16, weight='bold', bbox=dict(facecolor='white', edgecolor='black', pad=10.0))
 			plt.title(r'$\mathrm{Response}\ U_{||}-$ %s'%labelname[:-13]+'$', fontsize = 28, y = 1.02)
 			if ptmax == 0:
@@ -1062,7 +1054,7 @@ def make_ResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,  min
 
 	return YMean
 
-def make_ResponseInvertedPlot(config, plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^Z', relateUnits = 'GeV', binRanges = np.array([42])):
+def make_ResponseInvertedPlot(config, plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^H', relateUnits = 'GeV', binRanges = np.array([42])):
 
 	if binRanges[0] == 42:
 		if minrange == 42:
@@ -1123,7 +1115,7 @@ def make_ResponseInvertedPlot(config, plotData,dictPlot, bosonName, targetvariab
 			YStdErr[index] = get_weightedStdErr(currentDistri, dictPlot, config['method'][0])
 			if config['studyVars']:
 				quantityComparison(config, currentDistri, dictPlot, AlternativeDistri, bosonName)
-			plt.xlabel(r'$ -p_T^Z/ U_{||}$',fontsize = 22)
+			plt.xlabel(r'$ -p_T^H/ U_{||}$',fontsize = 22)
 			plt.text(0.04*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.9*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$(%i < %s < %i)\,\mathrm{%s}$'%(XRange[index],relateVar, XRange[index+1],relateUnits),color = 'k',fontsize=16, weight='bold', bbox=dict(facecolor='white', edgecolor='black', pad=10.0))
 			plt.title(r'$\mathrm{Response^{-1}}\ U_{||}\ -\ $ %s'%labelname[:-13]+'$', fontsize = 28, y = 1.02)
 			if ptmax == 0:
@@ -1176,7 +1168,7 @@ def make_ResponseInvertedPlot(config, plotData,dictPlot, bosonName, targetvariab
 
 	return 0
 
-def make_METResponseInvertedPlot(config, plotData,dictPlot, bosonName, targetvariable,	minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^Z', relateUnits = 'GeV', binRanges = np.array([42])):
+def make_METResponseInvertedPlot(config, plotData,dictPlot, bosonName, targetvariable,	minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^H', relateUnits = 'GeV', binRanges = np.array([42])):
 
 	if binRanges[0] == 42:
 		if minrange == 42:
@@ -1273,7 +1265,7 @@ def make_METResponseInvertedPlot(config, plotData,dictPlot, bosonName, targetvar
 
 	return 0
 
-def make_METResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,	minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^Z', relateUnits = 'GeV', binRanges = np.array([42])):
+def make_METResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,	minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^H', relateUnits = 'GeV', binRanges = np.array([42])):
 
 	if binRanges[0] == 42:
 		if minrange == 42:
@@ -1372,7 +1364,7 @@ def make_METResponsePlot(config, plotData,dictPlot, bosonName, targetvariable,	m
 
 
 
-def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable,	minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^Z', relateUnits = 'GeV', binRanges = np.array([42])):
+def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable,	minrange=42,maxrange=0, stepwidth=0, ptmin =0,ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^H', relateUnits = 'GeV', binRanges = np.array([42])):
 
 	if binRanges[0] == 42:
 		if minrange == 42:
@@ -1469,7 +1461,7 @@ def make_ResolutionPerpPlot(config,plotData,dictPlot, bosonName, targetvariable,
 
 	return
 
-def make_ResponsePerpPlot(config, plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^Z', relateUnits = 'GeV', binRanges = np.array([42])):
+def make_ResponsePerpPlot(config, plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin=0, ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^H', relateUnits = 'GeV', binRanges = np.array([42])):
 
 	if binRanges[0] == 42:
 		if minrange == 42:
@@ -1568,7 +1560,7 @@ def make_ResponsePerpPlot(config, plotData,dictPlot, bosonName, targetvariable, 
 
 
 
-def make_ControlPlots(config, plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin=0,ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^Z', relateUnits = 'GeV', binRanges = np.array([42])):
+def make_ControlPlots(config, plotData,dictPlot, bosonName, targetvariable,  minrange=42,maxrange=0, stepwidth=0, ptmin=0,ptmax=0, labelname = 'MVA Met', relateVar = 'p_T^H', relateUnits = 'GeV', binRanges = np.array([42])):
 
 	bosonNameLong = bosonName + '_LongZ'
 	bosonNamePerp = bosonName + '_PerpZ'
@@ -1625,8 +1617,8 @@ def make_JetStudyPlots(config, plotData, dictPlot):
 		if not os.path.exists((config['outputDir'] + 'ControlPlots/SingleDistributions/')):
 			os.makedirs((config['outputDir'] + 'ControlPlots/SingleDistributions/'))
 
-		YResponse = make_ResponsePlot(config, lowerData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^Z','GeV')
-		XRange, YVariance = make_ResolutionPlot(config, lowerData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^Z','GeV')
+		YResponse = make_ResponsePlot(config, lowerData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^H','GeV')
+		XRange, YVariance = make_ResolutionPlot(config, lowerData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^H','GeV')
 
 	if 'recoilslimmedMETs_LongZ' in dictPlot:
 		bosonNameLong = 'recoilslimmedMETs_LongZ'
@@ -1634,8 +1626,8 @@ def make_JetStudyPlots(config, plotData, dictPlot):
 
 		if not os.path.exists((config['outputDir'] + 'ControlPlots/SingleDistributions/')):
 			os.makedirs((config['outputDir'] + 'ControlPlots/SingleDistributions/'))
-		YResponse = make_ResponsePlot(config, lowerData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^Z','GeV')
-		XRange, YVariance = make_ResolutionPlot(config, lowerData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^Z','GeV')
+		YResponse = make_ResponsePlot(config, lowerData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^H','GeV')
+		XRange, YVariance = make_ResolutionPlot(config, lowerData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^H','GeV')
 
 
 	upperData = plotData[(0.1<plotData[:,dictPlot['Jet0_Pt']])]
@@ -1649,16 +1641,16 @@ def make_JetStudyPlots(config, plotData, dictPlot):
 		bosonNamePerp = 'LongZCorrectedRecoil_PerpZ'
 		if not os.path.exists((config['outputDir'] + 'ControlPlots/SingleDistributions/')):
 			os.makedirs((config['outputDir'] + 'ControlPlots/SingleDistributions/'))
-		YResponse = make_ResponsePlot(config, upperData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^Z','GeV')
-		XRange, YVariance = make_ResolutionPlot(config, upperData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^Z','GeV')
+		YResponse = make_ResponsePlot(config, upperData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^H','GeV')
+		XRange, YVariance = make_ResolutionPlot(config, upperData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^H','GeV')
 
 	if 'recoilslimmedMETs_LongZ' in dictPlot:
 		bosonNameLong = 'recoilslimmedMETs_LongZ'
 		bosonNamePerp = 'recoilslimmedMETs_PerpZ'
 		if not os.path.exists((config['outputDir'] + 'ControlPlots/SingleDistributions/')):
 			os.makedirs((config['outputDir'] + 'ControlPlots/SingleDistributions/'))
-		YResponse = make_ResponsePlot(config, upperData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^Z','GeV')
-		XRange, YVariance = make_ResolutionPlot(config, upperData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^Z','GeV')
+		YResponse = make_ResponsePlot(config, upperData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^H','GeV')
+		XRange, YVariance = make_ResolutionPlot(config, upperData, dictPlot, bosonNameLong, 'Boson_Pt',  10,200,10,0,0,'PF Met','p_T^H','GeV')
 
 def make_MoreBDTPlots(config, plotData, dictPlot):
 
@@ -1670,7 +1662,7 @@ def make_MoreBDTPlots(config, plotData, dictPlot):
 
 	plt.clf()
 	plt.hist(plotData[:,dictPlot['Boson_Pt']], num_bins, histtype = 'step', range=[0,200], facecolor='green')
-	plt.xlabel(r'$p_T^Z\ \mathrm{in\ GeV}$',fontsize = 22)
+	plt.xlabel(r'$p_T^H\ \mathrm{in\ GeV}$',fontsize = 22)
 	plt.ylabel(r'$\mathrm{Events}$',fontsize = 22)
 	plt.text(0.0*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],1.015*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],args.decayProcess,color = 'k',fontsize=18, weight='bold')
 	plt.plot((5,5),(plt.ylim()[0], plt.ylim()[1]), 'k--')
@@ -1768,21 +1760,19 @@ def make_MoreBDTPlots(config, plotData, dictPlot):
 		plt.clf()
 
 
-	if 'recoilslimmedMETs_Phi' in dictPlot and 'Boson_Phi' in dictPlot:
 		slicedDataLow = plotData[60>plotData[:,dictPlot['Boson_Pt']],:]
 		slicedDataHigh = plotData[60<=plotData[:,dictPlot['Boson_Pt']],:]
 		DPhiPFBosonLow = slicedDataLow[:,dictPlot["Boson_Phi"]]-slicedDataLow[:,dictPlot["recoilslimmedMETs_Phi"]]+np.pi - 2.*np.pi*((slicedDataLow[:,dictPlot["Boson_Phi"]]-slicedDataLow[:,dictPlot["recoilslimmedMETs_Phi"]])>0)
 		DPhiPFBosonHigh = slicedDataHigh[:,dictPlot["Boson_Phi"]]-slicedDataHigh[:,dictPlot["recoilslimmedMETs_Phi"]]+np.pi - 2.*np.pi*((slicedDataHigh[:,dictPlot["Boson_Phi"]]-slicedDataHigh[:,dictPlot["recoilslimmedMETs_Phi"]])>0)
 		n, bins, patches = plt.hist(DPhiPFBosonLow, num_bins, histtype = 'step', label=(r'$\mathrm{Target}\ T_2 = \phi_Z - \phi_U - \pi$'), range=[-np.pi,np.pi])
 		plt.xlabel(r'$\mathrm{Target}\ T_1$',fontsize = 20)
-		plt.ylim([plt.ylim()[0],(plt.ylim()[1]-plt.ylim()[0])*1.3])
 		plt.plot((0.5,0.5),(plt.ylim()[0], plt.ylim()[1]), 'r--', label=r'$\mathrm{Target\ cut} \pm 0.5$')
 		plt.plot((-0.5,-0.5),(plt.ylim()[0], plt.ylim()[1]), 'r--')
 		plt.ylabel(r'$\mathrm{Events}$',fontsize = 20)
-		plt.legend(loc='upper right', numpoints=1,fontsize = 20)
-		plt.text(0.65*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.6*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^Z < 60\,\mathrm{GeV}$',color = 'k',fontsize=16, weight='bold', bbox=dict(facecolor='white', edgecolor='black', pad=10.0))
+		plt.legend(loc='best', numpoints=1,fontsize = 20)
+		plt.text(0.65*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.6*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^H < 60\,\mathrm{GeV}$',color = 'k',fontsize=16, weight='bold', bbox=dict(facecolor='white', edgecolor='black', pad=10.0))
 		plt.xlim([-np.pi,np.pi])
-		#plt.text(0.0*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],1.015*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],args.decayProcess,color = 'k',fontsize=18, weight='bold')
+		plt.text(0.0*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],1.015*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],args.decayProcess,color = 'k',fontsize=18, weight='bold')
 		plt.tight_layout()
 		plt.savefig(config['outputDir'] + "/CustomPlots/TargetPhiLow.pdf")
 
@@ -1790,14 +1780,13 @@ def make_MoreBDTPlots(config, plotData, dictPlot):
 
 		n, bins, patches = plt.hist(DPhiPFBosonHigh, num_bins, histtype = 'step', label=(r'$\mathrm{Target}\ T_2 =\phi_Z - \phi_U - \pi$'), range=[-np.pi,np.pi])
 		plt.xlabel(r'$\mathrm{Target}\ T_1$',fontsize = 20)
-		plt.ylim([plt.ylim()[0],(plt.ylim()[1]-plt.ylim()[0])*1.3])
 		plt.plot((0.5,0.5),(plt.ylim()[0], plt.ylim()[1]), 'r--', label=r'$\mathrm{Target\ cut} \pm 0.5$')
 		plt.plot((-0.5,-0.5),(plt.ylim()[0], plt.ylim()[1]), 'r--')
 		plt.ylabel(r'$\mathrm{Events}$',fontsize = 20)
-		plt.legend(loc='upper right', numpoints=1, fontsize = 20)
-		plt.text(0.65*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.6*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^Z > 60\,\mathrm{GeV}$',color = 'k',fontsize=16, weight='bold', bbox=dict(facecolor='white', edgecolor='black', pad=10.0))
+		plt.legend(loc='best', numpoints=1, fontsize = 20)
+		plt.text(0.65*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.6*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^H > 60\,\mathrm{GeV}$',color = 'k',fontsize=16, weight='bold', bbox=dict(facecolor='white', edgecolor='black', pad=10.0))
 		plt.xlim([-np.pi,np.pi])
-		#plt.text(0.0*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],1.015*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],args.decayProcess,color = 'k',fontsize=18, weight='bold')
+		plt.text(0.0*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],1.015*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],args.decayProcess,color = 'k',fontsize=18, weight='bold')
 		plt.tight_layout()
 		plt.savefig(config['outputDir'] + "/CustomPlots/TargetPhiHigh.pdf")
 
@@ -1813,7 +1802,7 @@ def make_MoreBDTPlots(config, plotData, dictPlot):
 		TargetDistri = BosonPtDistri/PhiPtDistri
 
 		plt.clf()
-		n, bins, patches = plt.hist(BosonPtDistri, num_bins, facecolor='green', label=(r'$p_T^Z$'))
+		n, bins, patches = plt.hist(BosonPtDistri, num_bins, facecolor='green', label=(r'$p_T^H$'))
 		plt.legend(loc='best', numpoints=1)
 		plt.xlabel(r'$p_t$ in GeV',fontsize = 20)
 		plt.ylabel('Frequency distribution',fontsize = 20)
@@ -1841,22 +1830,19 @@ def make_MoreBDTPlots(config, plotData, dictPlot):
 
 		plt.clf()
 		num_bins = 60
-		#n, bins, patches = plt.hist([BosonPtDistri,PhiPtDistri], num_bins, histtype = 'step', label=[r'$p_T^Z$',r'$\phi - \mathrm{MVA}\ E_T^{miss}$'], range=[lowerPtCut-50,upperPtCut+50])
-		n, bins, patches = plt.hist(PhiPtDistri, num_bins, histtype = 'step', label=r'$U_{||,\phi}^{\mathrm{MVA}}$', range=[lowerPtCut-50,upperPtCut+50])
+		n, bins, patches = plt.hist([BosonPtDistri,PhiPtDistri], num_bins, histtype = 'step', label=[r'$p_T^H$',r'$\mathrm{MVA Met}_{\phi}$'], range=[lowerPtCut-50,upperPtCut+50])
 
-		plt.ylim([plt.ylim()[0],(plt.ylim()[1]-plt.ylim()[0])*1.2])
-		plt.legend(loc='best', numpoints=1, fontsize = 20)
-		plt.xlabel(r'$p_T^Z\ \mathrm{in\ GeV}$',fontsize = 20)
-		plt.ylabel(r'$\mathrm{Events}$',fontsize = 20)
-		plt.xlim([lowerPtCut-50,upperPtCut+50])
-		plt.text(0.65*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.45*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$(80 < p_T^Z < 100)\,\mathrm{GeV}$',color = 'k',fontsize=16, weight='bold', bbox=dict(facecolor='white', edgecolor='black', pad=10.0))
+		plt.legend(loc='best', numpoints=1)
+		plt.xlabel(r'$p_T$ in GeV',fontsize = 20)
+		plt.ylabel('Frequency distribution',fontsize = 20)
+		plt.text(0.65*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.4*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$(80 < p_T^H < 100)\,\mathrm{GeV}$',color = 'k',fontsize=16, weight='bold', bbox=dict(facecolor='white', edgecolor='black', pad=10.0))
 		plt.tight_layout()
 		plt.savefig(config['outputDir'] + "/CustomPlots/BosonAndPhiPt_%i_to%i.pdf"%(lowerPtCut,upperPtCut))
 
 		plt.clf()
 
 		num_bins = 50
-		n, bins, patches = plt.hist(TargetDistri, num_bins, histtype = 'step', label=(r'$\mathrm{Target}\ T_2 = -p_T^Z / U_{||,\phi}^{\mathrm{MVA}}$'), range=[0.5,2])
+		n, bins, patches = plt.hist(TargetDistri, num_bins, histtype = 'step', label=(r'$\mathrm{Target}\ T_2 = -p_T^H / U_{||,\phi}^{\mathrm{MVA}}$'), range=[0.5,2])
 		plt.xlabel(r'$\mathrm{Target}\ T_2$',fontsize = 18)
 		plt.plot((0.7,0.7),(plt.ylim()[0], plt.ylim()[1]), 'k--', label=r'$\mathrm{Target\ Cut}\ 1 \pm 0.3$')
 		plt.plot((1.3,1.3),(plt.ylim()[0], plt.ylim()[1]), 'k--')
@@ -1868,7 +1854,7 @@ def make_MoreBDTPlots(config, plotData, dictPlot):
 		plt.plot((1.7,1.7),(plt.ylim()[0], plt.ylim()[1]), 'r--')
 		plt.ylabel(r'$\mathrm{Events}$',fontsize = 18)
 		plt.legend(loc='upper right', numpoints=1, fontsize = 14)
-		plt.text(0.65*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.4*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$(80 < p_T^Z < 100)\,\mathrm{GeV}$',color = 'k',fontsize=16, weight='bold', bbox=dict(facecolor='white', edgecolor='black', pad=10.0))
+		plt.text(0.65*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.4*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$(80 < p_T^H < 100)\,\mathrm{GeV}$',color = 'k',fontsize=16, weight='bold', bbox=dict(facecolor='white', edgecolor='black', pad=10.0))
 		plt.text(0.35*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$\mu_{empiric} = %.3f$''\n'%TargetDistri.mean(),color = 'k',fontsize=16)
 		plt.tight_layout()
 		plt.savefig(config['outputDir'] + "/CustomPlots/Target_%i_to_%i.pdf"%(lowerPtCut,upperPtCut))
@@ -1899,7 +1885,7 @@ def make_MoreBDTPlots(config, plotData, dictPlot):
 		plt.xlabel(r'$\phi_Z - \phi_U - \pi$',fontsize = 20)
 		plt.ylabel('Frequency distribution',fontsize = 20)
 		plt.legend(loc='best', numpoints=1)
-		plt.text(0.65*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.6*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$(15<p_T^Z < 25)\,\mathrm{GeV}$',color = 'k',fontsize=16, weight='bold', bbox=dict(facecolor='white', edgecolor='black', pad=10.0))
+		plt.text(0.65*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.6*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$(15<p_T^H < 25)\,\mathrm{GeV}$',color = 'k',fontsize=16, weight='bold', bbox=dict(facecolor='white', edgecolor='black', pad=10.0))
 		#plt.xlim([-np.pi,np.pi])
 		plt.tight_layout()
 		plt.savefig(config['outputDir'] + "/CustomPlots/AngularDifferenceMVAAndPF.pdf")
@@ -1924,8 +1910,8 @@ def make_MoreBDTPlots(config, plotData, dictPlot):
 		BosonPtSelected = AlternativeDistri[:,dictPlot["Boson_Pt"]]
 		UParalSelected = -AlternativeDistri[:,dictPlot["LongZCorrectedRecoil_LongZ"]]
 		plt.clf()
-		n, bins, patches = plt.hist([BosonPtSelected,UParalSelected], num_bins, range=[40,200], histtype = 'step', label=[r'$p_T^Z$',r'$U_{||}$'])
-		plt.xlabel(r"$p_T^Z$", fontsize = 20)
+		n, bins, patches = plt.hist([BosonPtSelected,UParalSelected], num_bins, range=[40,200], histtype = 'step', label=[r'$p_T^H$',r'$U_{||}$'])
+		plt.xlabel(r"$p_T^H$", fontsize = 20)
 		plt.ylabel("Events", fontsize = 20)
 		plt.legend(loc='best', numpoints=1, fontsize = 20)
 		plt.tight_layout()
@@ -1936,7 +1922,7 @@ def make_MoreBDTPlots(config, plotData, dictPlot):
 		UOverBoson = UParalSelected/BosonPtSelected
 
 		plt.clf
-		n, bins, patches = plt.hist([UOverBoson,BosonOverU], num_bins, normed=True,range=[0,2.5], histtype = 'step', label=[r'$U_{||}/p_T^Z$',r'$p_T^Z/U_{||}$'])
+		n, bins, patches = plt.hist([UOverBoson,BosonOverU], num_bins, normed=True,range=[0,2.5], histtype = 'step', label=[r'$U_{||}/p_T^H$',r'$p_T^H/U_{||}$'])
 		yUOverB = mlab.normpdf(bins, UOverBoson.mean(), UOverBoson.std())
 		yBOverU = mlab.normpdf(bins, BosonOverU.mean(), BosonOverU.std())
 		#plt.plot(bins, yUOverB, 'b--')
@@ -1944,7 +1930,7 @@ def make_MoreBDTPlots(config, plotData, dictPlot):
 		plt.xlabel(r"$Response$", fontsize = 20)
 		plt.ylabel("Distribution function", fontsize = 20)
 		plt.legend(loc='best', numpoints=1, fontsize = 20)
-		plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.30*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$Events=%i$''\n'r'$<p_T^Z/U_{||}> = %.3f$''\n'r'$<U_{||}/p_T^Z> = %.3f$''\n'%(AlternativeDistri.shape[0],UOverBoson.mean(),BosonOverU.mean()),color = 'k',fontsize=20)
+		plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.30*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$Events=%i$''\n'r'$<p_T^H/U_{||}> = %.3f$''\n'r'$<U_{||}/p_T^H> = %.3f$''\n'%(AlternativeDistri.shape[0],UOverBoson.mean(),BosonOverU.mean()),color = 'k',fontsize=20)
 		plt.tight_layout()
 		plt.savefig(config['outputDir'] + "/CustomPlots/AsymmetryOutput.pdf")
 		plt.clf()
@@ -2120,14 +2106,14 @@ def plot_results(config, plotData, dictPlot):
 
 		plt.clf()
 		plt.figure(4)
-		#plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_T^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 20)
+		#plt.xlabel(r'#PV ($%i\,\mathrm{GeV} < p_T^H < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 20)
 		if config['fixedRange']:
-			plt.ylim([0.,1.05])
+			plt.ylim([0.6,1.05])
 		if min > 0:
-			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^Z > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
+			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^H > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
 		plt.xlabel(r'#PV',fontsize = 20)
-		plt.ylabel(r'$\left<U_{||} / -p_T^Z\right>$',fontsize = 22)
-		#plt.ylabel(r'$<-p_T^Z/U_{\|}>$',fontsize = 20)
+		plt.ylabel(r'$\left<U_{||} / -p_T^H\right>$',fontsize = 22)
+		#plt.ylabel(r'$<-p_T^H/U_{\|}>$',fontsize = 20)
 		plt.title(r'$\mathrm{Response}\ U_{||}$', fontsize = 28, y = 1.02)
 		legend = plt.legend(loc='best', shadow=True, numpoints=1, fontsize = 20)
 		plt.plot((plt.xlim()[0], plt.xlim()[1]), (1, 1), 'k--')
@@ -2137,13 +2123,13 @@ def plot_results(config, plotData, dictPlot):
 		plt.clf()
 
 		plt.figure(5)
-		#plt.xlabel(r'#PU ($%i\,\mathrm{GeV} < p_T^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 20)
+		#plt.xlabel(r'#PU ($%i\,\mathrm{GeV} < p_T^H < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 20)
 		if config['fixedRange']:
 			plt.ylim([12,30])
 		if min > 0:
-			plt.text(0.20*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.10*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^Z > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
+			plt.text(0.20*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.10*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^H > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
 		plt.xlabel(r'#PV',fontsize = 20)
-		plt.ylabel(r'$\sigma(U_{||} + p_T^Z)\ \mathrm{in\ GeV}$',fontsize = 22)
+		plt.ylabel(r'$\sigma(U_{||} + p_T^H)\ \mathrm{in\ GeV}$',fontsize = 22)
 		plt.title(r'$\mathrm{Resolution}\ U_{||}$', fontsize = 28, y = 1.02)
 		legend = plt.legend(loc='best', shadow=True, numpoints=1, fontsize = 20)
 		plt.text(0.0*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],1.015*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],args.decayProcess,color = 'k',fontsize=18, weight='bold')
@@ -2153,9 +2139,9 @@ def plot_results(config, plotData, dictPlot):
 
 		plt.figure(6)
 		if config['fixedRange']:
-			plt.ylim([7.5,35])
+			plt.ylim([12,30])
 		if min > 0:
-			plt.text(0.20*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.10*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^Z > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
+			plt.text(0.20*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.10*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^H > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
 		plt.xlabel(r'#PV',fontsize = 20)
 		plt.ylabel(r'$\mathrm{Resolution} / \mathrm{Response}$',fontsize = 22)
 		plt.title(r'$\mathrm{Response\ Corrected}$', fontsize = 28, y = 1.02)
@@ -2169,7 +2155,7 @@ def plot_results(config, plotData, dictPlot):
 		if config['fixedRange']:
 			plt.ylim([-1,1])
 		if min > 0:
-			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^Z > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
+			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^H > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
 		legend = plt.legend(loc='best', shadow=True, numpoints=1, fontsize = 20)
 		plt.xlabel(r'#PV',fontsize = 20)
 		plt.ylabel(r'$\left<U_\bot\right>$',fontsize = 22)
@@ -2180,11 +2166,11 @@ def plot_results(config, plotData, dictPlot):
 		plt.clf()
 
 		plt.figure(8)
-		#plt.xlabel(r'#PU ($%i\,\mathrm{GeV} < p_T^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 20)
+		#plt.xlabel(r'#PU ($%i\,\mathrm{GeV} < p_T^H < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 20)
 		if config['fixedRange']:
 			plt.ylim([12,30])
 		if min > 0:
-			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^Z > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
+			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^H > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
 		plt.xlabel(r'#PV',fontsize = 20)
 		plt.ylabel(r'$\sigma(U_\bot)\ \mathrm{in\ GeV}$',fontsize = 22)
 		plt.title(r'$\mathrm{Resolution}\ U_\bot$', fontsize = 28, y = 1.02)
@@ -2196,10 +2182,10 @@ def plot_results(config, plotData, dictPlot):
 
 		plt.figure(9)
 		if config['fixedRange']:
-			plt.ylim([0,2])
+			plt.ylim([0.8,2.3])
 		if min > 0:
-			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^Z > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
-		#plt.xlabel(r'#PU ($%i\,\mathrm{GeV} < p_T^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 20)
+			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^H > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
+		#plt.xlabel(r'#PU ($%i\,\mathrm{GeV} < p_T^H < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 20)
 		plt.xlabel(r'#PV',fontsize = 20)
 		plt.ylabel(r'$\left<E_{t,||}^{miss}/E_{t,gen}^{miss}\right>$',fontsize = 22)
 		plt.title(r'$\mathrm{Response}\ E_{T,||}^{miss}$', fontsize = 28, y = 1.02)
@@ -2214,9 +2200,9 @@ def plot_results(config, plotData, dictPlot):
 		if config['fixedRange']:
 			plt.ylim([12.5,32.5])
 		if min > 0:
-			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^Z > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
+			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^H > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
 		plt.ylabel(r'$\sigma(E_{t,||}^{miss}-E_{t,gen}^{miss})\ \mathrm{in\ GeV}$',fontsize = 22)
-		#plt.xlabel(r'#PU ($%i\,\mathrm{GeV} < p_T^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 20)
+		#plt.xlabel(r'#PU ($%i\,\mathrm{GeV} < p_T^H < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 20)
 		#location lower right
 		plt.xlabel(r'#PV',fontsize = 20)
 
@@ -2232,7 +2218,7 @@ def plot_results(config, plotData, dictPlot):
 		if config['fixedRange']:
 			plt.ylim([12.5,32.5])
 		if min > 0:
-			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^Z > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
+			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^H > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
 		plt.ylabel(r'$\sigma(E_{t\bot}^{miss})\ \mathrm{in\ GeV}$',fontsize = 22)
 		plt.xlabel(r'#PV',fontsize = 20)
 		plt.title(r'$\mathrm{Resolution}\ E_{T,\bot}^{miss}$', fontsize = 28, y = 1.02)
@@ -2245,12 +2231,12 @@ def plot_results(config, plotData, dictPlot):
 		plt.clf()
 		plt.figure(12)
 		if config['fixedRange']:
-			plt.ylim([0.6,1.05])
+			plt.ylim([0.0,1.3])
 		if min > 0:
-			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^Z > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
+			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^H > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
 		plt.xlabel(r'#PV',fontsize = 20)
-		#plt.ylabel(r'$<U_{\|} / -p_T^Z>$',fontsize = 20)
-		plt.ylabel(r'$\left<-p_T^Z/U_{||}\right>$',fontsize = 22)
+		#plt.ylabel(r'$<U_{\|} / -p_T^H>$',fontsize = 20)
+		plt.ylabel(r'$\left<-p_T^H/U_{||}\right>$',fontsize = 22)
 		plt.title(r'$\mathrm{Response^{-1}}\ U_{||}$', fontsize = 28, y = 1.02)
 		legend = plt.legend(loc='best', shadow=True, numpoints=1, fontsize = 20)
 		plt.plot((plt.xlim()[0], plt.xlim()[1]), (1, 1), 'k--')
@@ -2263,8 +2249,8 @@ def plot_results(config, plotData, dictPlot):
 		if config['fixedRange']:
 			plt.ylim([0,2])
 		if min > 0:
-			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^Z > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
-		#plt.xlabel(r'#PU ($%i\,\mathrm{GeV} < p_T^Z < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 20)
+			plt.text(0.60*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],0.15*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],r'$p_T^H > %i\,\mathrm{GeV}$'%min,color = 'k',fontsize=24, weight='bold', bbox=dict(facecolor='none', edgecolor='black', pad=10.0))
+		#plt.xlabel(r'#PU ($%i\,\mathrm{GeV} < p_T^H < %i\,\mathrm{GeV}$)'%(min,bosonmax[i]),fontsize = 20)
 		plt.xlabel(r'#PV',fontsize = 20)
 		plt.ylabel(r'$\left<E_{t,gen}^{miss}/E_{t,||}^{miss}\right>$',fontsize = 22)
 		plt.title(r'$\mathrm{Response^{-1}}\ E_{T,||}^{miss}$', fontsize = 28, y = 1.02)
@@ -2293,58 +2279,58 @@ def plot_results(config, plotData, dictPlot):
 		if 'LongZCorrectedRecoil_LongZ' in dictPlot:
 			#If labeling is activated
 			if 'inputLabel' in config:
-				make_ControlPlots(config, plotData, dictPlot, 'LongZCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][0],'p_T^Z','GeV', binRanges=binRangesPt)
+				make_ControlPlots(config, plotData, dictPlot, 'LongZCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][0],'p_T^H','GeV', binRanges=binRangesPt)
 			else:
-				make_ControlPlots(config, plotData, dictPlot, 'LongZCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,r'$\mathrm{MVA}\ E_T^{miss}$','p_T^Z','GeV', binRanges=binRangesPt)
+				make_ControlPlots(config, plotData, dictPlot, 'LongZCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,r'$\mathrm{MVA}\ E_T^{miss}$','p_T^H','GeV', binRanges=binRangesPt)
 
 			#for additional inputs
 			for index in range(len(config['inputFile'])-1):
 				if 'inputLabel' in config:
-					make_ControlPlots(config, plotData, dictPlot, 'V%iLongZCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][index+1],'p_T^Z','GeV', binRanges=binRangesPt)
+					make_ControlPlots(config, plotData, dictPlot, 'V%iLongZCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][index+1],'p_T^H','GeV', binRanges=binRangesPt)
 				else:
-					make_ControlPlots(config, plotData, dictPlot, 'V%iLongZCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,'MVA Met %i'%(index+2),'p_T^Z','GeV', binRanges=binRangesPt)
+					make_ControlPlots(config, plotData, dictPlot, 'V%iLongZCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,'MVA Met %i'%(index+2),'p_T^H','GeV', binRanges=binRangesPt)
 
 		#Phi Corrected MVAMET Plots
 		if plotconfig['plotPhiCorrected']:
 			if 'PhiCorrectedRecoil_LongZ' in dictPlot:
 				if 'inputLabel' in config:
-					make_ControlPlots(config, plotData, dictPlot, 'PhiCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][0],'p_T^Z','GeV', binRanges=binRangesPt)
+					make_ControlPlots(config, plotData, dictPlot, 'PhiCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][0],'p_T^H','GeV', binRanges=binRangesPt)
 				else:
-					make_ControlPlots(config, plotData, dictPlot, 'PhiCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,r'$\phi - \mathrm{MVA}\ E_T^{miss}$','p_T^Z','GeV', binRanges=binRangesPt)
+					make_ControlPlots(config, plotData, dictPlot, 'PhiCorrectedRecoil', 'Boson_Pt', 10,200,10,0,0,r'$\phi - \mathrm{MVA}\ E_T^{miss}$','p_T^H','GeV', binRanges=binRangesPt)
 
 				for index in range(len(config['inputFile'])-1):
 					if 'inputLabel' in config:
-						make_ControlPlots(config, plotData, dictPlot, 'V%iPhiCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][index+1],'p_T^Z','GeV', binRanges=binRangesPt)
+						make_ControlPlots(config, plotData, dictPlot, 'V%iPhiCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,config['inputLabel'][index+1],'p_T^H','GeV', binRanges=binRangesPt)
 					else:
-						make_ControlPlots(config, plotData, dictPlot, 'V%iPhiCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,'MVA Met %i'%(index+2),'p_T^Z','GeV', binRanges=binRangesPt)
+						make_ControlPlots(config, plotData, dictPlot, 'V%iPhiCorrectedRecoil'%index, 'Boson_Pt', 10,200,10,0,0,'MVA Met %i'%(index+2),'p_T^H','GeV', binRanges=binRangesPt)
 
 	#PF Met Control Plots Pt
 	if 'recoilslimmedMETs_LongZ' in dictPlot:
-		make_ControlPlots(config, plotData, dictPlot, 'recoilslimmedMETs', 'Boson_Pt', 10,200,10,0,0,r'$\mathrm{PF}\ E_T^{miss}$','p_T^Z','GeV', binRanges=binRangesPt)
+		make_ControlPlots(config, plotData, dictPlot, 'recoilslimmedMETs', 'Boson_Pt', 10,200,10,0,0,r'$\mathrm{PF}\ E_T^{miss}$','p_T^H','GeV', binRanges=binRangesPt)
 
 
 	#Puppi Met Control Plots Pt
 	if plotconfig['plotPuppiPerformance']:
 		if 'recoilslimmedMETsPuppi_LongZ' in dictPlot:
-			make_ControlPlots(config, plotData, dictPlot, 'recoilslimmedMETsPuppi', 'Boson_Pt', 10,200,10,0,0,r'$\mathrm{PUPPI}\ E_T^{miss}$','p_T^Z','GeV', binRanges=binRangesPt)
+			make_ControlPlots(config, plotData, dictPlot, 'recoilslimmedMETsPuppi', 'Boson_Pt', 10,200,10,0,0,r'$\mathrm{PUPPI}\ E_T^{miss}$','p_T^H','GeV', binRanges=binRangesPt)
 
 
 	if plotconfig['plotAdditionalMETPerformance']:
 		if 'recoilpatpfTrackMET_LongZ' in dictPlot:
-			make_ControlPlots(config, plotData, dictPlot, 'recoilpatpfTrackMET', 'Boson_Pt', 10,200,10,0,0,r'$\mathrm{Track}\ E_T^{miss}$','p_T^Z','GeV', binRanges=binRangesPt)
+			make_ControlPlots(config, plotData, dictPlot, 'recoilpatpfTrackMET', 'Boson_Pt', 10,200,10,0,0,r'$\mathrm{Track}\ E_T^{miss}$','p_T^H','GeV', binRanges=binRangesPt)
 		if 'recoilpatpfPUMET_LongZ' in dictPlot:
-			make_ControlPlots(config, plotData, dictPlot, 'recoilpatpfPUMET', 'Boson_Pt', 10,200,10,0,0,r'$\mathrm{PU}\ E_T^{miss}$','p_T^Z','GeV', binRanges=binRangesPt)
+			make_ControlPlots(config, plotData, dictPlot, 'recoilpatpfPUMET', 'Boson_Pt', 10,200,10,0,0,r'$\mathrm{PU}\ E_T^{miss}$','p_T^H','GeV', binRanges=binRangesPt)
 		if 'recoilpatpfPUCorrectedMET_LongZ' in dictPlot:
-			make_ControlPlots(config, plotData, dictPlot, 'recoilpatpfPUCorrectedMET', 'Boson_Pt', 10,200,10,0,0,r'$\mathrm{PU Corrected}\ E_T^{miss}$','p_T^Z','GeV', binRanges=binRangesPt)
+			make_ControlPlots(config, plotData, dictPlot, 'recoilpatpfPUCorrectedMET', 'Boson_Pt', 10,200,10,0,0,r'$\mathrm{PU Corrected}\ E_T^{miss}$','p_T^H','GeV', binRanges=binRangesPt)
 		if 'recoilpatpfNoPUMET_LongZ' in dictPlot:
-			make_ControlPlots(config, plotData, dictPlot, 'recoilpatpfNoPUMET', 'Boson_Pt', 10,200,10,0,0,r'$\mathrm{No PU}\ E_T^{miss}$','p_T^Z','GeV', binRanges=binRangesPt)
+			make_ControlPlots(config, plotData, dictPlot, 'recoilpatpfNoPUMET', 'Boson_Pt', 10,200,10,0,0,r'$\mathrm{No PU}\ E_T^{miss}$','p_T^H','GeV', binRanges=binRangesPt)
 
 	plt.figure(4)
 	legend = plt.legend(loc='best', shadow=True, numpoints=1, fontsize = 20)
 	#legend.get_frame().set_alpha(0.5)
-	plt.ylabel(r'$\left<U_{||} / -p_T^Z\right>$', fontsize = 22)
-	#plt.ylabel(r'$<-p_T^Z/U_{\|}>$', fontsize = 20)
-	plt.xlabel(r'$p_T^Z\ \mathrm{in\ GeV}$', fontsize = 22)
+	plt.ylabel(r'$\left<U_{||} / -p_T^H\right>$', fontsize = 22)
+	#plt.ylabel(r'$<-p_T^H/U_{\|}>$', fontsize = 20)
+	plt.xlabel(r'$p_T^H\ \mathrm{in\ GeV}$', fontsize = 22)
 	plt.title(r'$\mathrm{Response}\ U_{||}$', fontsize= 28, y = 1.02)
 	plt.plot((plt.xlim()[0], plt.xlim()[1]), (1, 1), 'k--')
 	if config['fixedRange']:
@@ -2355,8 +2341,8 @@ def plot_results(config, plotData, dictPlot):
 	plt.savefig(config['outputDir'] + 'Response_vs_BosonPt.pdf')
 	plt.clf()
 	plt.figure(5)
-	plt.xlabel(r'$p_T^Z\ \mathrm{in\ GeV}$', fontsize = 22)
-	plt.ylabel(r'$\sigma(U_{||} + p_T^Z)\ \mathrm{in\ GeV}$', fontsize = 22)
+	plt.xlabel(r'$p_T^H\ \mathrm{in\ GeV}$', fontsize = 22)
+	plt.ylabel(r'$\sigma(U_{||} + p_T^H)\ \mathrm{in\ GeV}$', fontsize = 22)
 	plt.title(r'$\mathrm{Resolution}\ U_{||}$', fontsize = 28, y = 1.02)
 	legend = plt.legend(loc='best', shadow=True, numpoints=1, fontsize = 20)
 	#legend.get_frame().set_alpha(0.5)
@@ -2367,7 +2353,7 @@ def plot_results(config, plotData, dictPlot):
 	plt.savefig(config['outputDir'] + 'Resolution_vs_BosonPt.pdf')
 	plt.clf()
 	plt.figure(6)
-	plt.xlabel(r'$p_T^Z\ \mathrm{in\ GeV}$', fontsize = 22)
+	plt.xlabel(r'$p_T^H\ \mathrm{in\ GeV}$', fontsize = 22)
 	plt.ylabel(r'$\mathrm{Resolution / Response}$',fontsize = 22)
 	plt.title(r'$\mathrm{Response\ Corrected}$', fontsize = 28, y = 1.02)
 	legend = plt.legend(loc='best', shadow=True, numpoints=1, fontsize = 20)
@@ -2381,7 +2367,7 @@ def plot_results(config, plotData, dictPlot):
 	plt.figure(7)
 	legend = plt.legend(loc='best', shadow=True, numpoints=1, fontsize = 20)
 	#legend.get_frame().set_alpha(0.5)
-	plt.xlabel(r'$p_T^Z\ \mathrm{in\ GeV}$', fontsize = 22)
+	plt.xlabel(r'$p_T^H\ \mathrm{in\ GeV}$', fontsize = 22)
 	plt.ylabel(r'$\left<U_\bot\right>$',fontsize = 22)
 	plt.title(r'$\mathrm{Response}\ U_\bot$', fontsize = 28, y = 1.02)
 	if config['fixedRange']:
@@ -2391,7 +2377,7 @@ def plot_results(config, plotData, dictPlot):
 	plt.savefig(config['outputDir'] + 'ResponsePerp_vs_BosonPt.pdf')
 	plt.clf()
 	plt.figure(8)
-	plt.xlabel(r'$p_T^Z\ \mathrm{in\ GeV}$', fontsize = 22)
+	plt.xlabel(r'$p_T^H\ \mathrm{in\ GeV}$', fontsize = 22)
 	plt.ylabel(r'$\sigma(U_\bot)\ \mathrm{in\ GeV}$',fontsize = 22)
 	plt.title(r'$\mathrm{Resolution}\ U_\bot$', fontsize = 28, y = 1.02)
 	legend = plt.legend(loc='best', shadow=True, numpoints=1, fontsize = 20)
@@ -2405,38 +2391,38 @@ def plot_results(config, plotData, dictPlot):
 	plt.figure(9)
 	legend = plt.legend(loc='best', shadow=True, numpoints=1, fontsize = 20)
 	#legend.get_frame().set_alpha(0.5)
-	plt.xlabel(r'$p_T^Z\ \mathrm{in\ GeV}$', fontsize = 22)
+	plt.xlabel(r'$p_T^H\ \mathrm{in\ GeV}$', fontsize = 22)
 	#plt.ylabel('MET_Long/genMET',fontsize = 20)
 	plt.ylabel(r'$\left<E_{T,||}^{miss}/E_{T,gen}^{miss}\right>$',fontsize = 22)
 	#plt.ylabel(r'$\ensuremath{{\not\mathrel{E}}_T}$',fontsize = 20)
 	plt.title(r'$\mathrm{Response}\ E_{T,||}^{miss}$', fontsize = 28, y = 1.02)
 	plt.plot((plt.xlim()[0], plt.xlim()[1]), (1, 1), 'k--')
 	if config['fixedRange']:
-		plt.ylim([0.8,2.0])
+		plt.ylim([0.8,2.])
 	plt.text(0.0*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],1.015*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],args.decayProcess,color = 'k',fontsize=18, weight='bold')
 	plt.tight_layout()
 	plt.savefig(config['outputDir'] + 'METResponse_vs_BosonPt.pdf')
 	plt.clf()
 	plt.figure(10)
-	plt.xlabel(r'$p_T^Z\ \mathrm{in\ GeV}$', fontsize = 22)
+	plt.xlabel(r'$p_T^H\ \mathrm{in\ GeV}$', fontsize = 22)
 	plt.ylabel(r'$\sigma(E_{T,||}^{miss}-E_{T,gen}^{miss})\ \mathrm{in\ GeV}$',fontsize = 20)
 	plt.title(r'$\mathrm{Resolution}\ E_{T,||}^{miss}$', fontsize = 28, y = 1.02)
 	legend = plt.legend(loc='best', shadow=True, numpoints=1, fontsize = 20)
 	#legend.get_frame().set_alpha(0.5)
 	if config['fixedRange']:
-		plt.ylim([12.5,32.5])
+		plt.ylim([16.,30.])
 	plt.text(0.0*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],1.015*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],args.decayProcess,color = 'k',fontsize=18, weight='bold')
 	plt.tight_layout()
 	plt.savefig(config['outputDir'] + 'METResolution_vs_BosonPt.pdf')
 	plt.clf()
 	plt.figure(11)
-	plt.xlabel(r'$p_T^Z\ \mathrm{in\ GeV}$', fontsize = 22)
+	plt.xlabel(r'$p_T^H\ \mathrm{in\ GeV}$', fontsize = 22)
 	plt.ylabel(r'$\sigma(E_{T,\bot}^{miss})\ \mathrm{in\ GeV}$',fontsize = 22)
 	plt.title(r'$\mathrm{Resolution}\ E_{T,\bot}^{miss}$', fontsize = 28, y = 1.02)
 	legend = plt.legend(loc='best', shadow=True, numpoints=1, fontsize = 20)
 	#legend.get_frame().set_alpha(0.5)
 	if config['fixedRange']:
-		plt.ylim([12.5,32.5])
+		plt.ylim([16.,30.])
 	plt.text(0.0*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],1.015*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],args.decayProcess,color = 'k',fontsize=18, weight='bold')
 	plt.tight_layout()
 	plt.savefig(config['outputDir'] + 'METResolutionPerp_vs_BosonPt.pdf')
@@ -2444,13 +2430,13 @@ def plot_results(config, plotData, dictPlot):
 	plt.figure(12)
 	legend = plt.legend(loc='best', shadow=True, numpoints=1, fontsize = 20)
 	#legend.get_frame().set_alpha(0.5)
-	#plt.ylabel(r'$<U_{\|} / -p_T^Z>$', fontsize = 20)
-	plt.ylabel(r'$\left<-p_T^Z/U_{||}\right>$', fontsize = 22)
-	plt.xlabel(r'$p_T^Z\ \mathrm{in\ GeV}$', fontsize = 22)
+	#plt.ylabel(r'$<U_{\|} / -p_T^H>$', fontsize = 20)
+	plt.ylabel(r'$\left<-p_T^H/U_{||}\right>$', fontsize = 22)
+	plt.xlabel(r'$p_T^H\ \mathrm{in\ GeV}$', fontsize = 22)
 	plt.title(r'$\mathrm{Response^{-1}}\ U_{||}$', fontsize= 28, y = 1.02)
 	plt.plot((plt.xlim()[0], plt.xlim()[1]), (1, 1), 'k--')
 	if config['fixedRange']:
-		plt.ylim([0.6,1.05])
+		plt.ylim([0.0,1.3])
 	plt.text(0.0*(plt.xlim()[1]-plt.xlim()[0])+plt.xlim()[0],1.015*(plt.ylim()[1]-plt.ylim()[0])+plt.ylim()[0],args.decayProcess,color = 'k',fontsize=18, weight='bold')
 	plt.tight_layout()
 	plt.savefig(config['outputDir'] + 'ResponseInverted_vs_BosonPt.pdf')
@@ -2458,7 +2444,7 @@ def plot_results(config, plotData, dictPlot):
 	plt.figure(13)
 	legend = plt.legend(loc='best', shadow=True, numpoints=1, fontsize = 20)
 	#legend.get_frame().set_alpha(0.5)
-	plt.xlabel(r'$p_T^Z\ \mathrm{in\ GeV}$', fontsize = 22)
+	plt.xlabel(r'$p_T^H\ \mathrm{in\ GeV}$', fontsize = 22)
 	plt.title(r'$\mathrm{Response^{-1}}\ E_{T,||}^{miss}$', fontsize= 28, y = 1.02)
 	#plt.ylabel('MET_Long/genMET',fontsize = 20)
 	plt.ylabel(r'$\left<E_{T,gen}^{miss}/E_{T,||}^{miss}\right>$',fontsize = 22)
@@ -2523,7 +2509,7 @@ def main(config):
 
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser(description='Make MVAMet control plots. All parameters can be set by using these optional arguments. Fixed ranges and positioning of textboxes are partially hardcoded and need to be adjusted in the code.')
+	parser = argparse.ArgumentParser(description='Make MVAMet control plots.')
 	parser.add_argument('-p', '--plottingconfig', default='../configs/config.json', help='Path to configurations file')
 	parser.add_argument('-i', '--inputfile',nargs='+', default='', help='[optional] Inputfile(s) from which to create the plots from')
 	parser.add_argument('-l', '--inputlabel',nargs='+', default='', help='[optional] Inputlabelname(s) to use in plots')

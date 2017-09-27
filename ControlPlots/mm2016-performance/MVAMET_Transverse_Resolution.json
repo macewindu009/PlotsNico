@@ -9,7 +9,7 @@
         "pfrecoilPerp",
         "pfrecoilPerp"
     ], 
-    "y_label": "$\\sigma(U_{\\perp})$", 
+    "y_label": "$\\sigma(U_{\\perp})$ in GeV", 
     "y_bins": [
         "50,-100,100"
     ], 
