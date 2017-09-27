@@ -91,7 +91,7 @@ int main(int argc, char* argv[] )
                 "recoMetOnGenMetProjectionPar","recoMetOnGenMetProjectionPerp","recoMetOnGenMetProjectionPhi",
                 "recoPfMetOnGenMetProjectionPar","recoPfMetOnGenMetProjectionPerp","recoPfMetOnGenMetProjectionPhi",    
                 "genMetSumEt","genMetPt","genMetPhi",
-                "npv","njets","iso_1","iso_2", "ptvis", "eventWeight", "Jet0_Pt", "Jet0_Phi", "Jet1_Pt", "Jet1_Phi", "probChiSquare","probChiSquarePf"
+                "npv","njets","iso_1","iso_2", "ptvis", "Boson_Phi", "eventWeight", "Jet0_Pt", "Jet0_Phi", "Jet1_Pt", "Jet1_Phi", "probChiSquare","probChiSquarePf"
             };
                     
             /*

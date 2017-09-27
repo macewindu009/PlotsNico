@@ -26,7 +26,7 @@ def Treecopy(channel, inputfile, outputfileRoot, expression):
 							"recoMetOnGenMetProjectionPar","recoMetOnGenMetProjectionPerp","recoMetOnGenMetProjectionPhi",
 							"recoPfMetOnGenMetProjectionPar","recoPfMetOnGenMetProjectionPerp","recoPfMetOnGenMetProjectionPhi",		
 							"genMetSumEt","genMetPt","genMetPhi",
-							"npv","npu","njets","iso_1","iso_2","ptvis", "probChiSquare", "probChiSquarePf"
+							"npv","npu","njets","iso_1","iso_2","ptvis", "diLepLV", "probChiSquare", "probChiSquarePf"
 									]
 
 	for b in tree.GetListOfBranches():
@@ -46,7 +46,9 @@ def Treecopy(channel, inputfile, outputfileRoot, expression):
 	for b in tree.GetListOfBranches():
 		tree.SetBranchStatus(b.GetName(),1)
 
-	nEntries = tree.GetEntries();
+	nEntries = tree.GetEntries()
+
+
 
 	if expression == '':
 		if channel == 'mm':
@@ -54,6 +56,9 @@ def Treecopy(channel, inputfile, outputfileRoot, expression):
 			#expression =  "(extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(m_vis > 60.0)*(m_vis < 120.0)"
 		elif channel == 'mt':
 			expression = "(mt_1<40.0)*(againstElectronVLooseMVA6_2 > 0.5)*(againstMuonTight3_2 > 0.5)*(extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(dilepton_veto < 0.5)*(iso_1 < 0.15)*(byTightIsolationMVArun2v1DBoldDMwLT_2 > 0.5)"
+
+	#check for Nan values
+	expression += "*(!TMath::IsNaN(met))"
 
 	print('Applying weight string: %s'%expression)
 
@@ -77,6 +82,9 @@ def Treecopy(channel, inputfile, outputfileRoot, expression):
 	Jet1_Phi = array('f', [-666.0])
 	tree2.Branch('Jet1_Phi',Jet1_Phi, 'Jet1_Phi/F')
 
+	BosonPhiExpr = ROOT.TTreeFormula("name","diLepLV.fCoordinates.fPhi",tree) 
+	Boson_Phi = array('f', [-666.0])
+	tree2.Branch('Boson_Phi',Boson_Phi, 'Boson_Phi/F')
 
 	for i in range(nEntries):
 		tree.GetEntry(i)
@@ -87,6 +95,7 @@ def Treecopy(channel, inputfile, outputfileRoot, expression):
 		Jet0_Phi[0] = Jet0PhiExpr.EvalInstance()
 		Jet1_Pt[0] = Jet1PtExpr.EvalInstance()
 		Jet1_Phi[0] = Jet1PhiExpr.EvalInstance()
+		Boson_Phi[0] = BosonPhiExpr.EvalInstance()
 		if eventWeight[0] > 0:
 			tree2.Fill()
 		if i%100000 == 0:
@@ -164,7 +173,7 @@ if __name__ == "__main__":
 				if channel == 'mm':
 					expression = "(1.0)*(((1.0)))*eventWeight*(((genbosonmass >= 50.0 && (npartons == 0 || npartons >= 5))*3.95423374e-5) + ((genbosonmass >= 50.0 && npartons == 1)*1.27486147e-5) + ((genbosonmass >= 50.0 && npartons == 2)*1.3012785e-5) + ((genbosonmass >= 50.0 && npartons == 3)*1.33802133e-5) + ((genbosonmass >= 50.0 && npartons == 4)*1.09698723e-5)+((genbosonmass < 50.0)*numberGeneratedEventsWeight*crossSectionPerEventWeight))/(numberGeneratedEventsWeight*crossSectionPerEventWeight*sampleStitchingWeight)*(gen_match_1 < 4 || gen_match_2 < 4)*(extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(m_vis > 60.0)*(m_vis < 120.0)*(iso_2 < 0.15)*(iso_1 < 0.15)*((q_1*q_2)<0.0)*zPtReweightWeight"
 				elif channel == 'mt':
-					expression = "(gen_match_2 == 5)*((((1.0))))*(eventWeight)*((((genbosonmass >= 150.0 && (npartons == 0 || npartons >= 5))*3.95423374e-5) + ((genbosonmass >= 150.0 && npartons == 1)*1.27486147e-5) + ((genbosonmass >= 150.0 && npartons == 2)*1.3012785e-5) + ((genbosonmass >= 150.0 && npartons == 3)*1.33802133e-5) + ((genbosonmass >= 150.0 && npartons == 4)*1.09698723e-5)+((genbosonmass >= 50.0 && genbosonmass < 150.0 && (npartons == 0 || npartons >= 5))*3.95423374e-5) + ((genbosonmass >= 50.0 && genbosonmass < 150.0 && npartons == 1)*1.27486147e-5) + ((genbosonmass >= 50.0 && genbosonmass < 150.0 && npartons == 2)*1.3012785e-5) + ((genbosonmass >= 50.0 && genbosonmass < 150.0 && npartons == 3)*1.33802133e-5) + ((genbosonmass >= 50.0 && genbosonmass < 150.0 && npartons == 4)*1.09698723e-5)+((genbosonmass < 50.0)*numberGeneratedEventsWeight*crossSectionPerEventWeight))/(numberGeneratedEventsWeight*crossSectionPerEventWeight*sampleStitchingWeight)) "
+					expression = "(gen_match_2 == 5)*((((1.0))))*(eventWeight)*((((genbosonmass >= 150.0 && (npartons == 0 || npartons >= 5))*3.95423374e-5) + ((genbosonmass >= 150.0 && npartons == 1)*1.27486147e-5) + ((genbosonmass >= 150.0 && npartons == 2)*1.3012785e-5) + ((genbosonmass >= 150.0 && npartons == 3)*1.33802133e-5) + ((genbosonmass >= 150.0 && npartons == 4)*1.09698723e-5)+((genbosonmass >= 50.0 && genbosonmass < 150.0 && (npartons == 0 || npartons >= 5))*3.95423374e-5) + ((genbosonmass >= 50.0 && genbosonmass < 150.0 && npartons == 1)*1.27486147e-5) + ((genbosonmass >= 50.0 && genbosonmass < 150.0 && npartons == 2)*1.3012785e-5) + ((genbosonmass >= 50.0 && genbosonmass < 150.0 && npartons == 3)*1.33802133e-5) + ((genbosonmass >= 50.0 && genbosonmass < 150.0 && npartons == 4)*1.09698723e-5)+((genbosonmass < 50.0)*numberGeneratedEventsWeight*crossSectionPerEventWeight))/(numberGeneratedEventsWeight*crossSectionPerEventWeight*sampleStitchingWeight))*((0.95))*(extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(againstMuonTight3_2 > 0.5)*(dilepton_veto < 0.5)*(againstElectronVLooseMVA6_2 > 0.5)*(mt_1<50.0)*(byTightIsolationMVArun2v1DBoldDMwLT_2 > 0.5)*(iso_1 < 0.15)*((q_1*q_2)<0.0)*zPtReweightWeight"
 			if args.process == 'WJets':
 				if channel == 'mt':
 					expression = "(1.0)*(1.0)*(1.0)*(1.0)*(((1.0)*(1.0)))*eventWeight*(((npartons == 0 || npartons >= 5)*7.09390278348407e-4) + ((npartons == 1)*1.90063898596475e-4) + ((npartons == 2)*5.8529964471165e-5) + ((npartons == 3)*1.9206444928444e-5) + ((npartons == 4)*1.923548021385e-5))/(numberGeneratedEventsWeight*crossSectionPerEventWeight*sampleStitchingWeight)*(nbtag == 0)*(extraelec_veto < 0.5)*(extramuon_veto < 0.5)*(againstMuonTight3_2 > 0.5)*(dilepton_veto < 0.5)*(againstElectronVLooseMVA6_2 > 0.5)*(mt_1<40.0)*(byTightIsolationMVArun2v1DBoldDMwLT_2 > 0.5)*(iso_1 < 0.15)*((q_1*q_2)<0.0)"
