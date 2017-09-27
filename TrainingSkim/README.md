@@ -5,7 +5,7 @@ Make sure to turn on the usage of MVAMET in the kappa config file.
 
 ### Creating plotting files
 
-All createWHATEVERData.sh scripts merge all files of the corresponding decay process, shrink them and produce the corresponding csv File
+All createWHATEVERData.sh scripts merge all files of the corresponding decay process, shrink them and produce the corresponding csv file.
 They can be run with
 
 ```bash
@@ -19,7 +19,7 @@ shrink.py applies cuts on the skimmed data from SkimManager and saves it in a wa
 
 ### Make CSV Files
 
-makeCSVFile.C creates a CSV file from data which was produced by the MapAnalyzer (the data which is used for the BDT Training)
+makeCSVFile.C creates a CSV file from data which was produced by the MapAnalyzer (the data which is used for the BDT Training).
 
 makeCSVFromArtus.C creates a CSV file from skimmed data from the SkimManager.py
 
